@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -79,7 +80,9 @@ public class ResultController {
 
             // Создаем или обновляем результат
             Result result = resultRepository.findByUserIdAndOlympiadId(user.getId(), olympiadId)
-                .orElseGet(Result::new);
+                .stream()
+                .findFirst()
+                .orElse(new Result());
             
             result.setUser(user);
             result.setOlympiad(olympiad);
@@ -107,7 +110,9 @@ public class ResultController {
 
         // Создаем или обновляем рейтинг
         Rating rating = ratingRepository.findByOlympiadId(olympiadId)
-            .orElseGet(Rating::new);
+            .stream()
+            .findFirst()
+            .orElse(new Rating());
         
         rating.setOlympiad(olympiad);
         rating.setTotalScore(results.stream()

@@ -1,12 +1,11 @@
 package com.olimpiada.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import java.util.Set;
+import java.time.Duration;
+import java.util.List;
 
 @Entity
 @Table(name = "tasks")
-@Data
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,18 +15,75 @@ public class Task {
     @JoinColumn(name = "olympiad_id", nullable = false)
     private Olympiad olympiad;
 
-    @Column(name = "task_text", columnDefinition = "TEXT", nullable = false)
+    @Column(nullable = false)
     private String taskText;
 
-    @Column(name = "task_type", nullable = false)
-    private String taskType;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TaskType taskType;
 
-    @Column(name = "max_score", nullable = false)
-    private Integer maxScore;
+    @Column(nullable = false)
+    private Float maxScore;
 
-    @Column(name = "time_limit")
-    private Integer timeLimit;
+    @Column(nullable = false)
+    private Duration timeLimit;
 
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
-    private Set<Answer> answers;
+    private List<Answer> answers;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Olympiad getOlympiad() {
+        return olympiad;
+    }
+
+    public void setOlympiad(Olympiad olympiad) {
+        this.olympiad = olympiad;
+    }
+
+    public String getTaskText() {
+        return taskText;
+    }
+
+    public void setTaskText(String taskText) {
+        this.taskText = taskText;
+    }
+
+    public TaskType getTaskType() {
+        return taskType;
+    }
+
+    public void setTaskType(TaskType taskType) {
+        this.taskType = taskType;
+    }
+
+    public Float getMaxScore() {
+        return maxScore;
+    }
+
+    public void setMaxScore(Float maxScore) {
+        this.maxScore = maxScore;
+    }
+
+    public Duration getTimeLimit() {
+        return timeLimit;
+    }
+
+    public void setTimeLimit(Duration timeLimit) {
+        this.timeLimit = timeLimit;
+    }
+
+    public List<Answer> getAnswers() {
+        return answers;
+    }
+
+    public void setAnswers(List<Answer> answers) {
+        this.answers = answers;
+    }
 } 

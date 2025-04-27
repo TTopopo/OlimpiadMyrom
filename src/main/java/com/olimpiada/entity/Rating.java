@@ -1,12 +1,10 @@
 package com.olimpiada.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "ratings")
-@Data
 public class Rating {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,12 +14,41 @@ public class Rating {
     @JoinColumn(name = "olympiad_id", nullable = false)
     private Olympiad olympiad;
 
-    @Column(name = "total_score")
+    @Column(nullable = false)
     private Float totalScore;
 
-    @Column
-    private Integer place;
-
     @OneToMany(mappedBy = "rating", cascade = CascadeType.ALL)
-    private Set<Result> results;
+    private List<Result> results;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Olympiad getOlympiad() {
+        return olympiad;
+    }
+
+    public void setOlympiad(Olympiad olympiad) {
+        this.olympiad = olympiad;
+    }
+
+    public Float getTotalScore() {
+        return totalScore;
+    }
+
+    public void setTotalScore(Float totalScore) {
+        this.totalScore = totalScore;
+    }
+
+    public List<Result> getResults() {
+        return results;
+    }
+
+    public void setResults(List<Result> results) {
+        this.results = results;
+    }
 } 

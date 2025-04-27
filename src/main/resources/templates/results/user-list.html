@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Мои результаты</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>Мои результаты</h2>
+        
+        <div class="mb-3">
+            <a th:href="@{/api/olympiads}" class="btn btn-secondary">Назад к олимпиадам</a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Олимпиада</th>
+                        <th>Место</th>
+                        <th>Общий балл</th>
+                        <th>Статус</th>
+                        <th>Дата</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="result : ${results}">
+                        <td>
+                            <a th:href="@{/api/olympiads/{id}(id=${result.olympiad.id})}" 
+                               th:text="${result.olympiad.name}"></a>
+                        </td>
+                        <td th:text="${result.place}"></td>
+                        <td th:text="${result.totalScore}"></td>
+                        <td th:text="${result.status}"></td>
+                        <td th:text="${#temporals.format(result.submissionDate, 'dd.MM.yyyy HH:mm')}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html> 

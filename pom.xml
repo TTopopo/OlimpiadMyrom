@@ -9,10 +9,10 @@
 		<relativePath/>
 	</parent>
 	<groupId>com.olimpiada</groupId>
-	<artifactId>OlimpiadMyrom</artifactId>
+	<artifactId>olimpiada</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>OlimpiadMyrom</name>
-	<description>Olympiad Management System for MIVLGU</description>
+	<name>olimpiada</name>
+	<description>Olympiad Management System</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -36,11 +36,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
+			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

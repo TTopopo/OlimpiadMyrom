@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${olympiad.name} + ' - Результаты'"></title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 th:text="${olympiad.name} + ' - Результаты'"></h1>
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Место</th>
+                    <th>Участник</th>
+                    <th>Баллы</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="result, stat : ${results}">
+                    <td th:text="${stat.count}"></td>
+                    <td th:text="${result.key}"></td>
+                    <td th:text="${result.value}"></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <a href="/admin/results" class="btn btn-secondary">Назад к списку олимпиад</a>
+    </div>
+</body>
+</html> 

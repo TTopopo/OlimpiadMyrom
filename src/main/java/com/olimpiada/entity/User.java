@@ -3,24 +3,38 @@ package com.olimpiada.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Table(name = "users")
 @Data
-public class User {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, unique = true)
+    private String username;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false)
+    private String firstName;
+
+    @Column(nullable = false)
+    private String lastName;
 
     @Column(name = "full_name", nullable = false)
     private String fullName;
 
     @Column(nullable = false, unique = true)
     private String email;
-
-    @Column(nullable = false)
-    private String password;
 
     @Column(name = "birth_date", nullable = false)
     private LocalDate birthDate;
@@ -29,13 +43,36 @@ public class User {
     private String role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Participation> participations;
+    private List<UserAnswer> answers;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Answer> answers;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role));
+    }
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Result> results;
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    public String getUsername() {
+        return username;
+    }
 
     public Long getId() {
         return id;
@@ -85,27 +122,11 @@ public class User {
         this.role = role;
     }
 
-    public List<Participation> getParticipations() {
-        return participations;
-    }
-
-    public void setParticipations(List<Participation> participations) {
-        this.participations = participations;
-    }
-
-    public List<Answer> getAnswers() {
+    public List<UserAnswer> getAnswers() {
         return answers;
     }
 
-    public void setAnswers(List<Answer> answers) {
+    public void setAnswers(List<UserAnswer> answers) {
         this.answers = answers;
-    }
-
-    public List<Result> getResults() {
-        return results;
-    }
-
-    public void setResults(List<Result> results) {
-        this.results = results;
     }
 } 

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Олимпиада ещё не началась</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="alert alert-info">
+            <h4 class="alert-heading">Олимпиада ещё не началась</h4>
+            <p th:text="${message}"></p>
+            <hr>
+            <a href="/olympiads" class="btn btn-primary">Вернуться к списку олимпиад</a>
+        </div>
+    </div>
+</body>
+</html> 

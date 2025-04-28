@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Непроверенные ответы</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Непроверенные ответы</h1>
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Участник</th>
+                    <th>Задание</th>
+                    <th>Ответ</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="answer : ${answers}">
+                    <td th:text="${answer.user.username}"></td>
+                    <td th:text="${answer.task.title}"></td>
+                    <td th:text="${answer.answer}"></td>
+                    <td>
+                        <a th:href="@{/admin/answers/check/{id}(id=${answer.id})}" class="btn btn-primary">Проверить</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html> 

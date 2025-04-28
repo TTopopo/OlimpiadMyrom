@@ -5,9 +5,9 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Data
 @Entity
 @Table(name = "olympiads")
-@Data
 public class Olympiad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,20 +16,14 @@ public class Olympiad {
     @Column(nullable = false)
     private String name;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "start_date", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime startDate;
 
-    @Column(name = "end_date", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime endDate;
-
-    @Column(nullable = false)
-    private Integer age;
-
-    @Column(nullable = false)
-    private String status;
 
     @OneToMany(mappedBy = "olympiad", cascade = CascadeType.ALL)
     private List<Task> tasks;
@@ -81,22 +75,6 @@ public class Olympiad {
 
     public void setEndDate(LocalDateTime endDate) {
         this.endDate = endDate;
-    }
-
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public List<Task> getTasks() {

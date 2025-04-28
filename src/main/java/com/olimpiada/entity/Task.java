@@ -3,7 +3,9 @@ package com.olimpiada.entity;
 import jakarta.persistence.*;
 import java.time.Duration;
 import java.util.List;
+import lombok.Data;
 
+@Data
 @Entity
 @Table(name = "tasks")
 public class Task {
@@ -11,25 +13,28 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
+    private String title;
+
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String description;
+
+    @Column(nullable = false)
+    private Integer maxScore;
+
     @ManyToOne
     @JoinColumn(name = "olympiad_id", nullable = false)
     private Olympiad olympiad;
 
     @Column(nullable = false)
-    private String taskText;
+    private Duration timeLimit;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TaskType taskType;
 
-    @Column(nullable = false)
-    private Float maxScore;
-
-    @Column(nullable = false)
-    private Duration timeLimit;
-
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
-    private List<Answer> answers;
+    private List<UserAnswer> userAnswers;
 
     public Long getId() {
         return id;
@@ -48,26 +53,18 @@ public class Task {
     }
 
     public String getTaskText() {
-        return taskText;
+        return description;
     }
 
     public void setTaskText(String taskText) {
-        this.taskText = taskText;
+        this.description = taskText;
     }
 
-    public TaskType getTaskType() {
-        return taskType;
-    }
-
-    public void setTaskType(TaskType taskType) {
-        this.taskType = taskType;
-    }
-
-    public Float getMaxScore() {
+    public Integer getMaxScore() {
         return maxScore;
     }
 
-    public void setMaxScore(Float maxScore) {
+    public void setMaxScore(Integer maxScore) {
         this.maxScore = maxScore;
     }
 
@@ -79,11 +76,19 @@ public class Task {
         this.timeLimit = timeLimit;
     }
 
-    public List<Answer> getAnswers() {
-        return answers;
+    public List<UserAnswer> getAnswers() {
+        return userAnswers;
     }
 
-    public void setAnswers(List<Answer> answers) {
-        this.answers = answers;
+    public void setAnswers(List<UserAnswer> answers) {
+        this.userAnswers = answers;
+    }
+
+    public TaskType getTaskType() {
+        return taskType;
+    }
+
+    public void setTaskType(TaskType taskType) {
+        this.taskType = taskType;
     }
 } 

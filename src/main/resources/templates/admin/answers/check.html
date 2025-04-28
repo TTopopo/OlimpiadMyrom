@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Проверка ответа</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Проверка ответа</h1>
+        
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Задание: <span th:text="${answer.task.title}"></span></h5>
+                <p class="card-text">Участник: <span th:text="${answer.user.username}"></span></p>
+                <p class="card-text">Ответ: <span th:text="${answer.answer}"></span></p>
+                
+                <form th:action="@{/admin/answers/check/{id}(id=${answer.id})}" method="post">
+                    <div class="form-group">
+                        <label for="score">Оценка:</label>
+                        <input type="number" class="form-control" id="score" name="score" min="0" max="100" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Сохранить оценку</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

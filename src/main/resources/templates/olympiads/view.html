@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${olympiad.name}"></title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 th:text="${olympiad.name}"></h1>
+        <p>
+            <strong>Дата начала:</strong> <span th:text="${olympiad.startDate}"></span><br>
+            <strong>Дата окончания:</strong> <span th:text="${olympiad.endDate}"></span>
+        </p>
+        
+        <h2 class="mt-4">Задания</h2>
+        <div class="row">
+            <div class="col-md-6 mb-4" th:each="task : ${olympiad.tasks}">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${task.title}"></h5>
+                        <p class="card-text" th:text="${task.description}"></p>
+                        <p class="card-text">
+                            <strong>Максимальный балл:</strong> <span th:text="${task.maxScore}"></span>
+                        </p>
+                        <form th:action="@{/olympiads/{olympiadId}/tasks/{taskId}/submit(olympiadId=${olympiad.id}, taskId=${task.id})}" method="post">
+                            <div class="form-group">
+                                <label for="answer">Ваш ответ</label>
+                                <textarea class="form-control" id="answer" name="answer" rows="3" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Отправить ответ</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

@@ -1,8 +1,8 @@
 package com.olimpiada.entity;
 
 public enum TaskType {
-    THEORY,
-    PRACTICE,
-    TEST,
-    PROJECT
+    TEXT, // Текстовый ответ
+    CODE, // Программный код
+    MULTIPLE_CHOICE, // Множественный выбор
+    SINGLE_CHOICE // Одиночный выбор
 } 

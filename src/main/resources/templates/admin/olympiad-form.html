@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${olympiad.id == null ? 'Добавить олимпиаду' : 'Редактировать олимпиаду'}"></title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 th:text="${olympiad.id == null ? 'Добавить олимпиаду' : 'Редактировать олимпиаду'}"></h1>
+        
+        <form th:action="@{${olympiad.id == null ? '/admin/olympiads/add' : '/admin/olympiads/edit/' + olympiad.id}}" method="post">
+            <div class="form-group">
+                <label for="name">Название олимпиады</label>
+                <input type="text" class="form-control" id="name" name="name" th:value="${olympiad.name}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="startDate">Дата начала</label>
+                <input type="datetime-local" class="form-control" id="startDate" name="startDate" th:value="${olympiad.startDate}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="endDate">Дата окончания</label>
+                <input type="datetime-local" class="form-control" id="endDate" name="endDate" th:value="${olympiad.endDate}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Задания</label>
+                <div id="tasks">
+                    <div class="task-item mb-3">
+                        <input type="text" class="form-control mb-2" name="tasks[0].title" placeholder="Название задания" required>
+                        <textarea class="form-control mb-2" name="tasks[0].description" placeholder="Описание задания" required></textarea>
+                        <input type="number" class="form-control" name="tasks[0].maxScore" placeholder="Максимальный балл" required>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="addTask()">Добавить задание</button>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <a href="/admin/olympiads" class="btn btn-secondary">Отмена</a>
+        </form>
+    </div>
+    
+    <script>
+    function addTask() {
+        const tasksDiv = document.getElementById('tasks');
+        const taskCount = tasksDiv.children.length;
+        const newTask = document.createElement('div');
+        newTask.className = 'task-item mb-3';
+        newTask.innerHTML = `
+            <input type="text" class="form-control mb-2" name="tasks[${taskCount}].title" placeholder="Название задания" required>
+            <textarea class="form-control mb-2" name="tasks[${taskCount}].description" placeholder="Описание задания" required></textarea>
+            <input type="number" class="form-control" name="tasks[${taskCount}].maxScore" placeholder="Максимальный балл" required>
+        `;
+        tasksDiv.appendChild(newTask);
+    }
+    </script>
+</body>
+</html> 

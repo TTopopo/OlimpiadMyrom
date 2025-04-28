@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Результаты олимпиад</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Результаты олимпиад</h1>
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Название олимпиады</th>
+                    <th>Дата начала</th>
+                    <th>Дата окончания</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="olympiad : ${olympiads}">
+                    <td th:text="${olympiad.name}"></td>
+                    <td th:text="${olympiad.startDate}"></td>
+                    <td th:text="${olympiad.endDate}"></td>
+                    <td>
+                        <a th:href="@{/admin/results/{id}(id=${olympiad.id})}" class="btn btn-primary">Просмотреть результаты</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html> 

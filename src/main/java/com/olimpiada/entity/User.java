@@ -19,28 +19,19 @@ public class User implements UserDetails {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String username;
+    private String email;
 
     @Column(nullable = false)
     private String password;
 
     @Column(nullable = false)
-    private String firstName;
-
-    @Column(nullable = false)
-    private String lastName;
+    private String role;
 
     @Column(name = "full_name", nullable = false)
     private String fullName;
 
-    @Column(nullable = false, unique = true)
-    private String email;
-
     @Column(name = "birth_date", nullable = false)
     private LocalDate birthDate;
-
-    @Column(nullable = false)
-    private String role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserAnswer> answers;
@@ -70,8 +61,9 @@ public class User implements UserDetails {
         return true;
     }
 
+    @Override
     public String getUsername() {
-        return username;
+        return email;
     }
 
     public Long getId() {

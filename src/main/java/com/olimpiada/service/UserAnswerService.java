@@ -14,15 +14,15 @@ public class UserAnswerService {
     private UserAnswerRepository userAnswerRepository;
     
     public List<UserAnswer> findByUserAndOlympiad(Long userId, Long olympiadId) {
-        return userAnswerRepository.findByUserIdAndOlympiadId(userId, olympiadId);
+        return userAnswerRepository.findByUser_IdAndTask_Olympiad_Id(userId, olympiadId);
     }
     
     public List<UserAnswer> findByOlympiad(Long olympiadId) {
-        return userAnswerRepository.findByOlympiadId(olympiadId);
+        return userAnswerRepository.findByTask_Olympiad_Id(olympiadId);
     }
     
     public List<UserAnswer> findUncheckedAnswers(Long olympiadId) {
-        return userAnswerRepository.findByOlympiadIdAndScoreIsNull(olympiadId);
+        return userAnswerRepository.findByTask_Olympiad_IdAndScoreIsNull(olympiadId);
     }
     
     public UserAnswer findById(Long id) {

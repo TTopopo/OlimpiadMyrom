@@ -43,7 +43,7 @@ public class AdminResultsController {
         // Группируем ответы по пользователям и считаем общий балл
         Map<String, Integer> userScores = answers.stream()
             .collect(Collectors.groupingBy(
-                answer -> answer.getUser().getUsername(),
+                answer -> answer.getUser().getEmail(),
                 Collectors.summingInt(UserAnswer::getScore)
             ));
         

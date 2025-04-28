@@ -53,8 +53,9 @@ public class AuthController {
         userRepository.save(user);
 
         // Автоматический вход после регистрации
+        com.olimpiada.security.CustomUserDetails customUserDetails = new com.olimpiada.security.CustomUserDetails(user);
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                user, null, Collections.emptyList());
+                customUserDetails, null, customUserDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
         return "redirect:/";

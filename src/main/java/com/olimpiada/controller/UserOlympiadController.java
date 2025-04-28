@@ -51,13 +51,10 @@ public class UserOlympiadController {
         if (olympiad.getEndDate().isBefore(LocalDateTime.now())) {
             return "redirect:/user/olympiads";
         }
-        
-        String username = authentication.getName();
-        User user = userService.findByUsername(username);
-        
+        String email = authentication.getName();
+        User user = userService.findByEmail(email);
         List<Task> tasks = taskService.findByOlympiad(id);
         List<UserAnswer> userAnswers = userAnswerService.findByUserAndOlympiad(user.getId(), id);
-        
         model.addAttribute("olympiad", olympiad);
         model.addAttribute("tasks", tasks);
         model.addAttribute("userAnswers", userAnswers);
@@ -73,16 +70,13 @@ public class UserOlympiadController {
         if (task == null) {
             return "redirect:/user/olympiad/" + olympiadId;
         }
-        
-        String username = authentication.getName();
-        User user = userService.findByUsername(username);
-        
+        String email = authentication.getName();
+        User user = userService.findByEmail(email);
         UserAnswer userAnswer = new UserAnswer();
         userAnswer.setUser(user);
         userAnswer.setTask(task);
         userAnswer.setAnswer(answer);
         userAnswerService.save(userAnswer);
-        
         return "redirect:/user/olympiad/" + olympiadId;
     }
 } 

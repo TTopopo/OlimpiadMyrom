@@ -14,7 +14,7 @@ public class OlympiadController {
     @Autowired
     private OlympiadService olympiadService;
 
-    @GetMapping
+    @GetMapping("/olympiad/list")
     public String listOlympiads(Model model) {
         model.addAttribute("olympiads", olympiadService.findAll());
         return "olympiads/list";

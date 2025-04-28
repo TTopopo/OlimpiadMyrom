@@ -25,6 +25,9 @@ public class Olympiad {
     @Column(nullable = false)
     private LocalDateTime endDate;
 
+    @Column(nullable = false)
+    private Integer age;
+
     @OneToMany(mappedBy = "olympiad", cascade = CascadeType.ALL)
     private List<Task> tasks;
 
@@ -75,6 +78,14 @@ public class Olympiad {
 
     public void setEndDate(LocalDateTime endDate) {
         this.endDate = endDate;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
     }
 
     public List<Task> getTasks() {

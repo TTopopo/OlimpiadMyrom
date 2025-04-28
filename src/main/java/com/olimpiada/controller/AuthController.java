@@ -4,11 +4,14 @@ import com.olimpiada.entity.User;
 import com.olimpiada.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import java.util.Collections;
 
 @Controller
 public class AuthController {
@@ -49,7 +52,12 @@ public class AuthController {
 
         userRepository.save(user);
 
-        return "redirect:/login?registered=true";
+        // Автоматический вход после регистрации
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                user, null, Collections.emptyList());
+        SecurityContextHolder.getContext().setAuthentication(authToken);
+
+        return "redirect:/";
     }
 
     @GetMapping("/login")

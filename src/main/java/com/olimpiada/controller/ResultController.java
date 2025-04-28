@@ -4,6 +4,7 @@ import com.olimpiada.entity.*;
 import com.olimpiada.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -88,7 +89,7 @@ public class ResultController {
             result.setOlympiad(olympiad);
             result.setTotalScore(totalScore);
             result.setSubmissionDate(LocalDateTime.now());
-            result.setStatus("COMPLETED");
+            result.setStatus(ResultStatus.COMPLETED);
 
             resultRepository.save(result);
         }
@@ -128,5 +129,14 @@ public class ResultController {
             result.setRating(rating);
             resultRepository.save(result);
         }
+    }
+
+    @PostMapping("/{id}/status")
+    public String updateResultStatus(@PathVariable Long id, @RequestParam ResultStatus status) {
+        Result result = resultRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Result not found"));
+        result.setStatus(status);
+        resultRepository.save(result);
+        return "redirect:/api/results/" + id;
     }
 } 

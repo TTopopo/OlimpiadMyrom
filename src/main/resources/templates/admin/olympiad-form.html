@@ -25,12 +25,28 @@
             </div>
             
             <div class="form-group">
+                <label for="age">Возраст участников</label>
+                <input type="number" class="form-control" id="age" name="age" th:value="${olympiad.age}" required>
+            </div>
+            
+            <div class="form-group">
                 <label>Задания</label>
                 <div id="tasks">
                     <div class="task-item mb-3">
                         <input type="text" class="form-control mb-2" name="tasks[0].title" placeholder="Название задания" required>
                         <textarea class="form-control mb-2" name="tasks[0].description" placeholder="Описание задания" required></textarea>
-                        <input type="number" class="form-control" name="tasks[0].maxScore" placeholder="Максимальный балл" required>
+                        <input type="number" class="form-control mb-2" name="tasks[0].maxScore" placeholder="Максимальный балл" required>
+                        <select class="form-control mb-2" name="tasks[0].type" onchange="toggleOptions(this, 0)">
+                            <option value="text">Текстовый ответ</option>
+                            <option value="single">Один вариант</option>
+                            <option value="multiple">Несколько вариантов</option>
+                        </select>
+                        <div class="options-block" id="options-0" style="display:none;">
+                            <label>Варианты ответа:</label>
+                            <div class="option-list"></div>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addOption(this, 0)">Добавить вариант</button>
+                        </div>
+                        <button type="button" class="btn btn-danger btn-sm mt-2" onclick="removeTask(this)">Удалить задание</button>
                     </div>
                 </div>
                 <button type="button" class="btn btn-secondary" onclick="addTask()">Добавить задание</button>
@@ -50,9 +66,42 @@
         newTask.innerHTML = `
             <input type="text" class="form-control mb-2" name="tasks[${taskCount}].title" placeholder="Название задания" required>
             <textarea class="form-control mb-2" name="tasks[${taskCount}].description" placeholder="Описание задания" required></textarea>
-            <input type="number" class="form-control" name="tasks[${taskCount}].maxScore" placeholder="Максимальный балл" required>
+            <input type="number" class="form-control mb-2" name="tasks[${taskCount}].maxScore" placeholder="Максимальный балл" required>
+            <select class="form-control mb-2" name="tasks[${taskCount}].type" onchange="toggleOptions(this, ${taskCount})">
+                <option value="text">Текстовый ответ</option>
+                <option value="single">Один вариант</option>
+                <option value="multiple">Несколько вариантов</option>
+            </select>
+            <div class="options-block" id="options-${taskCount}" style="display:none;">
+                <label>Варианты ответа:</label>
+                <div class="option-list"></div>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addOption(this, ${taskCount})">Добавить вариант</button>
+            </div>
+            <button type="button" class="btn btn-danger btn-sm mt-2" onclick="removeTask(this)">Удалить задание</button>
         `;
         tasksDiv.appendChild(newTask);
+    }
+    function removeTask(btn) {
+        btn.closest('.task-item').remove();
+    }
+    function toggleOptions(select, idx) {
+        const block = document.getElementById('options-' + idx);
+        if (select.value === 'single' || select.value === 'multiple') {
+            block.style.display = '';
+        } else {
+            block.style.display = 'none';
+        }
+    }
+    function addOption(btn, idx) {
+        const list = btn.parentElement.querySelector('.option-list');
+        const optionCount = list.children.length;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'form-control mb-2';
+        input.name = `tasks[${idx}].options[${optionCount}]`;
+        input.placeholder = 'Вариант ответа';
+        input.required = true;
+        list.appendChild(input);
     }
     </script>
 </body>

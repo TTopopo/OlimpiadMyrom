@@ -53,7 +53,7 @@
         <div class="container text-center">
             <h1 class="display-4 mb-4">Добро пожаловать на платформу олимпиад</h1>
             <p class="lead mb-5">Участвуйте в олимпиадах, развивайте свои навыки и достигайте новых высот!</p>
-            <th:block th:if="${#authorization.expression('isAuthenticated() and !hasRole(''ADMIN'')')}">
+            <th:block th:if="${!#authorization.expression('hasRole(''ADMIN'')')}">
                 <a th:href="@{/start}" class="btn btn-light btn-lg">Начать участие</a>
             </th:block>
             <th:block th:if="${#authorization.expression('hasRole(''ADMIN'')')}">

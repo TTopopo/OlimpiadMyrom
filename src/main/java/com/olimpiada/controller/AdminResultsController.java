@@ -36,8 +36,7 @@ public class AdminResultsController {
 
     @GetMapping("/{olympiadId}")
     public String viewResults(@PathVariable Long olympiadId, Model model) {
-        Olympiad olympiad = olympiadService.findById(olympiadId)
-            .orElseThrow(() -> new RuntimeException("Olympiad not found"));
+        Olympiad olympiad = olympiadService.findById(olympiadId);
         List<UserAnswer> answers = userAnswerService.findByOlympiad(olympiadId);
         
         // Группируем ответы по пользователям и считаем общий балл

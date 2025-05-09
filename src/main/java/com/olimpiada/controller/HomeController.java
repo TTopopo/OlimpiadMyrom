@@ -3,10 +3,18 @@ package com.olimpiada.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
+import java.time.LocalDateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.olimpiada.service.OlympiadService;
 
 @Controller
 public class HomeController {
+
+    @Autowired
+    private OlympiadService olympiadService;
+
     @GetMapping("/")
     public String home(Model model) {
         model.addAttribute("title", "Главная страница");
@@ -20,35 +28,40 @@ public class HomeController {
 
     @GetMapping("/start")
     public String start(Model model) {
+        LocalDateTime now = LocalDateTime.now();
         model.addAttribute("title", "Начать участие");
+        model.addAttribute("activeOlympiads", olympiadService.findActiveOlympiads(now));
+        model.addAttribute("upcomingOlympiads", olympiadService.findUpcomingOlympiads(now));
+        model.addAttribute("pastOlympiads", olympiadService.findPastOlympiads(now));
         return "start";
-    }
-
-    @GetMapping("/profile")
-    public String profile(Model model) {
-        model.addAttribute("title", "Профиль");
-        return "profile";
     }
 
     @GetMapping("/olympiads")
     public String olympiads(Model model) {
+        LocalDateTime now = LocalDateTime.now();
         model.addAttribute("title", "Олимпиады");
+        model.addAttribute("activeOlympiads", olympiadService.findActiveOlympiads(now));
+        model.addAttribute("upcomingOlympiads", olympiadService.findUpcomingOlympiads(now));
+        model.addAttribute("pastOlympiads", olympiadService.findPastOlympiads(now));
         return "olympiads";
     }
 
     @GetMapping("/results")
+    @PreAuthorize("isAuthenticated()")
     public String results(Model model) {
         model.addAttribute("title", "Результаты");
         return "results";
     }
 
     @GetMapping("/rating")
+    @PreAuthorize("isAuthenticated()")
     public String rating(Model model) {
         model.addAttribute("title", "Рейтинг");
         return "rating";
     }
 
     @GetMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
     public String admin(Model model) {
         model.addAttribute("title", "Панель администратора");
         return "admin";

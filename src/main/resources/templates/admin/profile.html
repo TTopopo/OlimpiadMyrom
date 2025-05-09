@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Профиль администратора</title>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Олимпиады МИ ВлГУ</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/logout}">Выйти</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Информация об администраторе -->
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="h5 mb-0">Информация об администраторе</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <i class="bi bi-person-circle" style="font-size: 4rem;"></i>
+                        </div>
+                        <h4 class="text-center mb-3" th:text="${user.fullName}">Имя администратора</h4>
+                        <p class="mb-1"><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+                        <p class="mb-1"><strong>Роль:</strong> Администратор</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Основные функции -->
+            <div class="col-md-8">
+                <div class="row">
+                    <!-- Рейтинг участников -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="bi bi-trophy"></i>
+                                    Рейтинг участников
+                                </h5>
+                                <p class="card-text">Просмотр рейтинга участников и присвоение мест победителям.</p>
+                                <a th:href="@{/admin/rating}" class="btn btn-primary">Перейти к рейтингу</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Управление олимпиадами -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="bi bi-list-check"></i>
+                                    Управление олимпиадами
+                                </h5>
+                                <p class="card-text">Создание и редактирование олимпиад, управление заданиями.</p>
+                                <a th:href="@{/admin/olympiads}" class="btn btn-primary">Управление олимпиадами</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Проверка ответов -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="bi bi-check-circle"></i>
+                                    Проверка ответов
+                                </h5>
+                                <p class="card-text">Проверка и оценка ответов участников олимпиад.</p>
+                                <a th:href="@{/admin/answers}" class="btn btn-primary">Проверить ответы</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Просмотр профилей пользователей -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="bi bi-people"></i>
+                                    Пользователи
+                                </h5>
+                                <p class="card-text">Просмотр и управление профилями пользователей.</p>
+                                <a th:href="@{/admin/users}" class="btn btn-primary">Управление пользователями</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

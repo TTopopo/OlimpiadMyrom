@@ -30,7 +30,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
-                        <a class="nav-link" th:href="@{/profile}">
+                        <a class="nav-link" th:href="@{/user/profile}">
                             <i class="bi bi-person-circle"></i>
                             <span th:text="${#authorization.expression('hasRole(''ADMIN'')') ? 'Администратор' : (#authentication.principal.fullName != null ? #authentication.principal.fullName : #authentication.name)}"></span>
                         </a>
@@ -96,7 +96,7 @@
 
     <footer class="bg-dark text-white py-4">
         <div class="container text-center">
-            <p>&copy; 2024 Олимпиады Муромского Института ВлГУ. Все права защищены.</p>
+            <p>&copy; 2025 Олимпиады Муромского Института ВлГУ. Все права защищены.</p>
         </div>
     </footer>
 

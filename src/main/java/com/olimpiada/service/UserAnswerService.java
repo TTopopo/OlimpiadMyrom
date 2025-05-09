@@ -13,20 +13,25 @@ public class UserAnswerService {
     @Autowired
     private UserAnswerRepository userAnswerRepository;
     
+    public UserAnswer findById(Long id) {
+        return userAnswerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("UserAnswer not found with id: " + id));
+    }
+    
+    public List<UserAnswer> findByUserId(Long userId) {
+        return userAnswerRepository.findByUserId(userId);
+    }
+    
     public List<UserAnswer> findByUserAndOlympiad(Long userId, Long olympiadId) {
-        return userAnswerRepository.findByUser_IdAndTask_Olympiad_Id(userId, olympiadId);
+        return userAnswerRepository.findByUserIdAndTaskOlympiadId(userId, olympiadId);
     }
     
     public List<UserAnswer> findByOlympiad(Long olympiadId) {
-        return userAnswerRepository.findByTask_Olympiad_Id(olympiadId);
+        return userAnswerRepository.findByTaskOlympiadId(olympiadId);
     }
     
     public List<UserAnswer> findUncheckedAnswers(Long olympiadId) {
-        return userAnswerRepository.findByTask_Olympiad_IdAndScoreIsNull(olympiadId);
-    }
-    
-    public UserAnswer findById(Long id) {
-        return userAnswerRepository.findById(id).orElse(null);
+        return userAnswerRepository.findByTaskOlympiadIdAndScoreIsNull(olympiadId);
     }
     
     public UserAnswer save(UserAnswer userAnswer) {

@@ -46,8 +46,7 @@ public class UserOlympiadController {
 
     @GetMapping("/{id}")
     public String viewOlympiad(@PathVariable Long id, Model model, Authentication authentication) {
-        Olympiad olympiad = olympiadService.findById(id)
-            .orElseThrow(() -> new RuntimeException("Olympiad not found"));
+        Olympiad olympiad = olympiadService.findById(id);
         if (olympiad.getEndDate().isBefore(LocalDateTime.now())) {
             return "redirect:/user/olympiads";
         }

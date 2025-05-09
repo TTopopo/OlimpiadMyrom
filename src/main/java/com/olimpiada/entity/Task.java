@@ -26,7 +26,7 @@ public class Task {
     @JoinColumn(name = "olympiad_id", nullable = false)
     private Olympiad olympiad;
 
-    @Column(nullable = false)
+    @Column
     private Duration timeLimit;
 
     @Enumerated(EnumType.STRING)

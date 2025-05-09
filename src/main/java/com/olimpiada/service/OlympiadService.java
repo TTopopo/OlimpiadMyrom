@@ -19,8 +19,9 @@ public class OlympiadService {
         return olympiadRepository.findAll();
     }
     
-    public Optional<Olympiad> findById(Long id) {
-        return olympiadRepository.findById(id);
+    public Olympiad findById(Long id) {
+        return olympiadRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Olympiad not found with id: " + id));
     }
     
     public Olympiad save(Olympiad olympiad) {
@@ -28,7 +29,7 @@ public class OlympiadService {
     }
     
     public Olympiad update(Long id, Olympiad olympiad) {
-        Olympiad existingOlympiad = findById(id).orElse(null);
+        Olympiad existingOlympiad = findById(id);
         if (existingOlympiad != null) {
             olympiad.setId(id);
             return olympiadRepository.save(olympiad);

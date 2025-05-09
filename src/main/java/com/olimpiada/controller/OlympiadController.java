@@ -22,8 +22,7 @@ public class OlympiadController {
 
     @GetMapping("/{id}")
     public String viewOlympiad(@PathVariable Long id, Model model) {
-        Olympiad olympiad = olympiadService.findById(id)
-            .orElseThrow(() -> new RuntimeException("Olympiad not found"));
+        Olympiad olympiad = olympiadService.findById(id);
         model.addAttribute("olympiad", olympiad);
         return "olympiads/view";
     }

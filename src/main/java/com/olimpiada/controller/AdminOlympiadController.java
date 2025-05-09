@@ -52,4 +52,11 @@ public class AdminOlympiadController {
         olympiadService.deleteById(id);
         return "redirect:/admin/olympiads";
     }
+
+    @GetMapping("/{id}")
+    public String showOlympiadDetails(@PathVariable Long id, Model model) {
+        Olympiad olympiad = olympiadService.findById(id);
+        model.addAttribute("olympiad", olympiad);
+        return "admin/olympiad-details";
+    }
 } 

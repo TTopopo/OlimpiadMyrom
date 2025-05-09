@@ -28,6 +28,10 @@ public class Olympiad {
     @Column(nullable = false)
     private Integer age;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OlympiadStatus status = OlympiadStatus.DRAFT;
+
     @OneToMany(mappedBy = "olympiad", cascade = CascadeType.ALL)
     private List<Task> tasks;
 

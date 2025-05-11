@@ -78,7 +78,10 @@
                             Начало: <span th:text="${#temporals.format(olympiad.startDate, 'dd.MM.yyyy HH:mm')}"></span><br>
                             Окончание: <span th:text="${#temporals.format(olympiad.endDate, 'dd.MM.yyyy HH:mm')}"></span>
                         </p>
-                        <a th:href="@{/user/olympiad/{id}(id=${olympiad.id})}" class="btn btn-outline-primary">Подробнее</a>
+                        <a th:href="@{/olympiads/{id}(id=${olympiad.id})}" class="btn btn-outline-primary">Подробнее</a>
+                        <form th:action="@{/api/participations/olympiad/{olympiadId}(olympiadId=${olympiad.id})}" method="post" style="display:inline-block; margin-left: 10px;">
+                            <button type="submit" class="btn btn-success">Записаться на участие</button>
+                        </form>
                     </div>
                 </div>
             </div>

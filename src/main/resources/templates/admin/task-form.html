@@ -26,24 +26,26 @@
             </div>
             
             <div class="mb-3">
-                <label for="timeLimit" class="form-label">Время на выполнение (в минутах)</label>
-                <input type="number" class="form-control" id="timeLimit" name="timeLimit" th:value="${task.timeLimit != null ? task.timeLimit.toMinutes() : ''}">
-            </div>
-            
-            <div class="mb-3">
                 <label for="maxScore" class="form-label">Максимальный балл</label>
                 <input type="number" class="form-control" id="maxScore" name="maxScore" th:value="${task.maxScore}" required>
             </div>
             
             <div class="mb-3">
                 <label for="taskType" class="form-label">Тип задания</label>
-                <select class="form-control" id="taskType" name="taskType" required>
+                <select class="form-control" id="taskType" name="taskType" required onchange="showAnswerFields()">
                     <option th:each="type : ${taskTypes}"
                             th:value="${type}"
-                            th:text="${type}"
+                            th:text="${type == T(com.olimpiada.entity.TaskType).TEXT ? 'Текстовый ответ' :
+                                      type == T(com.olimpiada.entity.TaskType).CODE ? 'Программный код' :
+                                      type == T(com.olimpiada.entity.TaskType).MULTIPLE_CHOICE ? 'Множественный выбор' :
+                                      type == T(com.olimpiada.entity.TaskType).SINGLE_CHOICE ? 'Одиночный выбор' : type}"
                             th:selected="${task.taskType == type}">
                     </option>
                 </select>
+            </div>
+            
+            <div id="answerFields">
+                <!-- Динамические поля для ответа будут добавлены JS -->
             </div>
             
             <div class="d-flex gap-2">
@@ -52,6 +54,25 @@
             </div>
         </form>
     </div>
+    
+    <script>
+        function showAnswerFields() {
+            const type = document.getElementById('taskType').value;
+            const answerFields = document.getElementById('answerFields');
+            answerFields.innerHTML = '';
+            if (type === 'TEXT') {
+                answerFields.innerHTML = '<div class="mb-3"><label class="form-label">Правильный ответ (текст)</label><input type="text" class="form-control" name="correctAnswer"></div>';
+            } else if (type === 'CODE') {
+                answerFields.innerHTML = '<div class="mb-3"><label class="form-label">Правильный код</label><textarea class="form-control" name="correctAnswer" rows="4"></textarea></div>';
+            } else if (type === 'MULTIPLE_CHOICE') {
+                answerFields.innerHTML = '<div class="mb-3"><label class="form-label">Варианты ответов (через точку с запятой)</label><input type="text" class="form-control" name="options"></div>' +
+                    '<div class="mb-3"><label class="form-label">Правильные ответы (через точку с запятой)</label><input type="text" class="form-control" name="correctAnswer"></div>';
+            } else if (type === 'SINGLE_CHOICE') {
+                answerFields.innerHTML = '<div class="mb-3"><label class="form-label">Правильный ответ</label><input type="text" class="form-control" name="correctAnswer"></div>';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', showAnswerFields);
+    </script>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -63,4 +63,12 @@ public class AdminTaskController {
         taskService.delete(id);
         return "redirect:/admin/olympiads/" + olympiadId;
     }
+
+    @GetMapping("/list/{olympiadId}")
+    public String listTasksByOlympiad(@PathVariable Long olympiadId, Model model) {
+        Olympiad olympiad = olympiadService.findById(olympiadId);
+        model.addAttribute("olympiad", olympiad);
+        model.addAttribute("tasks", taskService.findByOlympiad(olympiadId));
+        return "admin/task-list";
+    }
 } 

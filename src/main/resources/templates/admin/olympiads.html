@@ -6,6 +6,9 @@
 </head>
 <body>
     <div class="container mt-4">
+        <a href="javascript:history.back()" class="btn btn-outline-secondary mb-3">
+            <i class="bi bi-arrow-left"></i> Назад
+        </a>
         <h1>Управление олимпиадами</h1>
         <a href="/admin/olympiads/add" class="btn btn-primary mb-3">Добавить олимпиаду</a>
         
@@ -26,6 +29,7 @@
                     <td>
                         <a th:href="@{/admin/olympiads/edit/{id}(id=${olympiad.id})}" class="btn btn-warning">Редактировать</a>
                         <a th:href="@{/admin/olympiads/delete/{id}(id=${olympiad.id})}" class="btn btn-danger">Удалить</a>
+                        <a th:href="@{/admin/tasks/list/{olympiadId}(olympiadId=${olympiad.id})}" class="btn btn-success">Список заданий</a>
                     </td>
                 </tr>
             </tbody>

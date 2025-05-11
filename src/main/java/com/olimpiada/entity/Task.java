@@ -1,7 +1,6 @@
 package com.olimpiada.entity;
 
 import jakarta.persistence.*;
-import java.time.Duration;
 import java.util.List;
 import lombok.Data;
 
@@ -25,9 +24,6 @@ public class Task {
     @ManyToOne
     @JoinColumn(name = "olympiad_id", nullable = false)
     private Olympiad olympiad;
-
-    @Column
-    private Duration timeLimit;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -66,14 +62,6 @@ public class Task {
 
     public void setMaxScore(Integer maxScore) {
         this.maxScore = maxScore;
-    }
-
-    public Duration getTimeLimit() {
-        return timeLimit;
-    }
-
-    public void setTimeLimit(Duration timeLimit) {
-        this.timeLimit = timeLimit;
     }
 
     public List<UserAnswer> getAnswers() {

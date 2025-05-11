@@ -30,6 +30,7 @@ public class AdminOlympiadController {
 
     @PostMapping("/add")
     public String addOlympiad(@ModelAttribute Olympiad olympiad) {
+        olympiad.setStatus(com.olimpiada.entity.OlympiadStatus.PUBLISHED);
         olympiadService.save(olympiad);
         return "redirect:/admin/olympiads";
     }

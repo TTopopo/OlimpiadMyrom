@@ -1,1 +1,0 @@
-UPDATE olympiad SET age = 18 WHERE age IS NULL; 

@@ -2,6 +2,7 @@ package com.olimpiada.controller;
 
 import com.olimpiada.entity.User;
 import com.olimpiada.entity.UserAnswer;
+import com.olimpiada.entity.UserRole;
 import com.olimpiada.service.UserAnswerService;
 import com.olimpiada.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class UserProfileController {
         User user = userService.findByEmail(userDetails.getUsername());
         model.addAttribute("user", user);
         
-        if (user.getRole().equals("ADMIN")) {
+        if (user.getRole() == UserRole.ADMIN) {
             // Для администратора показываем админ-профиль
             return "admin/profile";
         } else {

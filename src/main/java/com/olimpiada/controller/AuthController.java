@@ -1,6 +1,7 @@
 package com.olimpiada.controller;
 
 import com.olimpiada.entity.User;
+import com.olimpiada.entity.UserRole;
 import com.olimpiada.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -48,7 +49,7 @@ public class AuthController {
         user.setEmail(email);
         user.setBirthDate(java.time.LocalDate.parse(birthDate));
         user.setPassword(passwordEncoder.encode(password));
-        user.setRole("USER");
+        user.setRole(UserRole.USER);
 
         userRepository.save(user);
 

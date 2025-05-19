@@ -20,7 +20,7 @@ public class SecurityConfig {
                 .requestMatchers("/", "/register", "/login", "/start", "/olympiads", "/olympiads/**", "/css/**", "/js/**", "/images/**").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/user/profile").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/user/**").hasRole("USER")
+                .requestMatchers("/user/olympiad/**").hasRole("USER")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

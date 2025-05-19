@@ -115,4 +115,12 @@ public class Olympiad {
     public void setResults(List<Result> results) {
         this.results = results;
     }
+
+    public OlympiadStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OlympiadStatus status) {
+        this.status = status;
+    }
 } 

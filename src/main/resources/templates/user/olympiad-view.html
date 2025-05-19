@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Олимпиада</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 th:text="${olympiad.name}"></h2>
+        <p th:text="${olympiad.description}"></p>
+        
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <h3>Задания</h3>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>№</th>
+                                <th>Название</th>
+                                <th>Описание</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="task, stat : ${olympiad.tasks}">
+                                <td th:text="${stat.count}"></td>
+                                <td th:text="${task.name}"></td>
+                                <td th:text="${task.description}"></td>
+                                <td>
+                                    <a th:href="@{/user/olympiads/{olympiadId}/tasks/{taskId}(olympiadId=${olympiad.id}, taskId=${task.id})}" 
+                                       class="btn btn-primary">Решить</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

@@ -1,6 +1,7 @@
 package com.olimpiada.config;
 
 import com.olimpiada.entity.User;
+import com.olimpiada.entity.UserRole;
 import com.olimpiada.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -23,7 +24,7 @@ public class AdminInitializer implements CommandLineRunner {
             admin.setEmail("admin");
             admin.setPassword(passwordEncoder.encode("admin"));
             admin.setBirthDate(LocalDate.of(2000, 1, 1));
-            admin.setRole("ADMIN");
+            admin.setRole(UserRole.ADMIN);
             userRepository.save(admin);
         }
     }

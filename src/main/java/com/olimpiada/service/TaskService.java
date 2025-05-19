@@ -13,33 +13,20 @@ public class TaskService {
     @Autowired
     private TaskRepository taskRepository;
     
-    public List<Task> findAll() {
-        return taskRepository.findAll();
-    }
-    
-    public Task findById(Long id) {
+    public Task getTaskById(Long id) {
         return taskRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Task not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException("Задание не найдено"));
     }
     
-    public Task save(Task task) {
+    public List<Task> getTasksByOlympiadId(Long olympiadId) {
+        return taskRepository.findByOlympiadId(olympiadId);
+    }
+    
+    public Task saveTask(Task task) {
         return taskRepository.save(task);
     }
     
-    public Task update(Long id, Task task) {
-        Task existingTask = findById(id);
-        if (existingTask != null) {
-            task.setId(id);
-            return taskRepository.save(task);
-        }
-        return null;
-    }
-    
-    public void delete(Long id) {
+    public void deleteTask(Long id) {
         taskRepository.deleteById(id);
-    }
-    
-    public List<Task> findByOlympiad(Long olympiadId) {
-        return taskRepository.findByOlympiadId(olympiadId);
     }
 } 

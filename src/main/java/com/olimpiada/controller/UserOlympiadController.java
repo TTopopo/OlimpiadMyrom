@@ -11,9 +11,12 @@ import com.olimpiada.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import com.olimpiada.entity.Result;
+import com.olimpiada.service.ResultService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,6 +28,8 @@ public class UserOlympiadController {
 
     @Autowired
     private OlympiadService olympiadService;
+    @Autowired
+    private ResultService resultService;
     
     @Autowired
     private TaskService taskService;
@@ -52,7 +57,7 @@ public class UserOlympiadController {
         }
         String email = authentication.getName();
         User user = userService.findByEmail(email);
-        List<Task> tasks = taskService.findByOlympiad(id);
+        List<Task> tasks = taskService.getTasksByOlympiadId(id);
         List<UserAnswer> userAnswers = userAnswerService.findByUserAndOlympiad(user.getId(), id);
         model.addAttribute("olympiad", olympiad);
         model.addAttribute("tasks", tasks);
@@ -65,7 +70,7 @@ public class UserOlympiadController {
                              @PathVariable Long taskId,
                              @RequestParam String answer,
                              Authentication authentication) {
-        Task task = taskService.findById(taskId);
+        Task task = taskService.getTaskById(taskId);
         if (task == null) {
             return "redirect:/user/olympiad/" + olympiadId;
         }
@@ -77,5 +82,14 @@ public class UserOlympiadController {
         userAnswer.setAnswer(answer);
         userAnswerService.save(userAnswer);
         return "redirect:/user/olympiad/" + olympiadId;
+    }
+
+    @GetMapping("/results")
+    public String getOlympiadResults(@RequestParam Long olympiadId, Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.findByEmail(auth.getName());
+        List<Result> results = resultService.findByUserIdAndOlympiadId(user.getId(), olympiadId);
+        model.addAttribute("results", results);
+        return "results/user-list";
     }
 } 

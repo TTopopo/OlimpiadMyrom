@@ -22,11 +22,13 @@ public class UserService {
     }
     
     public User findById(Long id) {
-        return userRepository.findById(id).orElse(null);
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
     }
     
     public User findByEmail(String email) {
-        return userRepository.findByEmail(email).orElse(null);
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
     }
     
     public User save(User user) {

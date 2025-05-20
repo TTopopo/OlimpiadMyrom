@@ -34,6 +34,13 @@ public class User implements UserDetails {
     @Column(name = "birth_date", nullable = false)
     private LocalDate birthDate;
 
+    @Column(name = "education_level", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private EducationLevel educationLevel;
+
+    @Column(name = "course_number", nullable = false)
+    private Integer courseNumber;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserAnswer> answers;
 
@@ -121,5 +128,21 @@ public class User implements UserDetails {
 
     public void setAnswers(List<UserAnswer> answers) {
         this.answers = answers;
+    }
+
+    public EducationLevel getEducationLevel() {
+        return educationLevel;
+    }
+
+    public void setEducationLevel(EducationLevel educationLevel) {
+        this.educationLevel = educationLevel;
+    }
+
+    public Integer getCourseNumber() {
+        return courseNumber;
+    }
+
+    public void setCourseNumber(Integer courseNumber) {
+        this.courseNumber = courseNumber;
     }
 } 

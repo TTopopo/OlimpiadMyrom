@@ -29,7 +29,28 @@ public class AdminOlympiadController {
     }
 
     @PostMapping("/add")
-    public String addOlympiad(@ModelAttribute Olympiad olympiad) {
+    public String addOlympiad(@RequestParam String name,
+                              @RequestParam String description,
+                              @RequestParam Integer age,
+                              @RequestParam String educationLevel,
+                              @RequestParam Integer courseNumber,
+                              @RequestParam String startDate,
+                              @RequestParam String endDate,
+                              Model model) {
+        String error = validateEducationAndCourse(educationLevel, courseNumber);
+        if (error != null) {
+            model.addAttribute("olympiad", new Olympiad());
+            model.addAttribute("error", error);
+            return "admin/olympiad-form";
+        }
+        Olympiad olympiad = new Olympiad();
+        olympiad.setName(name);
+        olympiad.setDescription(description);
+        olympiad.setAge(age);
+        olympiad.setEducationLevel(com.olimpiada.entity.CourseType.valueOf(educationLevel));
+        olympiad.setCourseNumber(courseNumber);
+        olympiad.setStartDate(java.time.LocalDateTime.parse(startDate));
+        olympiad.setEndDate(java.time.LocalDateTime.parse(endDate));
         olympiad.setStatus(com.olimpiada.entity.OlympiadStatus.PUBLISHED);
         olympiadService.save(olympiad);
         return "redirect:/admin/olympiads";
@@ -42,8 +63,29 @@ public class AdminOlympiadController {
     }
 
     @PostMapping("/edit/{id}")
-    public String editOlympiad(@PathVariable Long id, @ModelAttribute Olympiad olympiad) {
-        olympiad.setId(id);
+    public String editOlympiad(@PathVariable Long id,
+                               @RequestParam String name,
+                               @RequestParam String description,
+                               @RequestParam Integer age,
+                               @RequestParam String educationLevel,
+                               @RequestParam Integer courseNumber,
+                               @RequestParam String startDate,
+                               @RequestParam String endDate,
+                               Model model) {
+        String error = validateEducationAndCourse(educationLevel, courseNumber);
+        if (error != null) {
+            model.addAttribute("olympiad", olympiadService.findById(id));
+            model.addAttribute("error", error);
+            return "admin/olympiad-form";
+        }
+        Olympiad olympiad = olympiadService.findById(id);
+        olympiad.setName(name);
+        olympiad.setDescription(description);
+        olympiad.setAge(age);
+        olympiad.setEducationLevel(com.olimpiada.entity.CourseType.valueOf(educationLevel));
+        olympiad.setCourseNumber(courseNumber);
+        olympiad.setStartDate(java.time.LocalDateTime.parse(startDate));
+        olympiad.setEndDate(java.time.LocalDateTime.parse(endDate));
         olympiadService.save(olympiad);
         return "redirect:/admin/olympiads";
     }
@@ -59,5 +101,15 @@ public class AdminOlympiadController {
         Olympiad olympiad = olympiadService.findById(id);
         model.addAttribute("olympiad", olympiad);
         return "admin/olympiad-details";
+    }
+
+    private String validateEducationAndCourse(String educationLevel, Integer courseNumber) {
+        if (educationLevel.equals("BACHELOR") && (courseNumber < 1 || courseNumber > 4)) {
+            return "Для бакалавриата допустимы только курсы 1-4";
+        }
+        if (educationLevel.equals("MASTER") && (courseNumber < 1 || courseNumber > 2)) {
+            return "Для магистратуры допустимы только курсы 1-2";
+        }
+        return null;
     }
 } 

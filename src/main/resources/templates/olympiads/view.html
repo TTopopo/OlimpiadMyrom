@@ -1,41 +1,49 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title th:text="${olympiad.name}"></title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <meta charset="UTF-8">
+    <title th:text="${olympiad.name}">Просмотр олимпиады</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container mt-4">
-        <a th:href="@{/start}" class="btn btn-outline-secondary mb-3">
-            <i class="bi bi-arrow-left"></i> Назад к списку олимпиад
-        </a>
-        <h1 th:text="${olympiad.name}"></h1>
-        <p>
-            <strong>Дата начала:</strong> <span th:text="${olympiad.startDate}"></span><br>
-            <strong>Дата окончания:</strong> <span th:text="${olympiad.endDate}"></span>
-        </p>
-        
-        <h2 class="mt-4">Задания</h2>
         <div class="row">
-            <div class="col-md-6 mb-4" th:each="task : ${olympiad.tasks}">
-                <div class="card">
+            <div class="col-md-12">
+                <h2 th:text="${olympiad.name}">Название олимпиады</h2>
+                <p class="lead" th:text="${olympiad.description}">Описание олимпиады</p>
+                
+                <div class="card mb-4">
                     <div class="card-body">
-                        <h5 class="card-title" th:text="${task.title}"></h5>
-                        <p class="card-text" th:text="${task.description}"></p>
-                        <p class="card-text">
-                            <strong>Максимальный балл:</strong> <span th:text="${task.maxScore}"></span>
-                        </p>
-                        <form th:action="@{/olympiads/{olympiadId}/tasks/{taskId}/submit(olympiadId=${olympiad.id}, taskId=${task.id})}" method="post">
-                            <div class="form-group">
-                                <label for="answer">Ваш ответ</label>
-                                <textarea class="form-control" id="answer" name="answer" rows="3" required></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Отправить ответ</button>
-                        </form>
+                        <h5 class="card-title">Информация об олимпиаде</h5>
+                        <p><strong>Дата начала:</strong> <span th:text="${#temporals.format(olympiad.startDate, 'dd.MM.yyyy HH:mm')}"></span></p>
+                        <p><strong>Дата окончания:</strong> <span th:text="${#temporals.format(olympiad.endDate, 'dd.MM.yyyy HH:mm')}"></span></p>
+                        <p><strong>Уровень образования:</strong> <span th:text="${olympiad.educationLevel}"></span></p>
+                        <p><strong>Курс:</strong> <span th:text="${olympiad.courseNumber}"></span></p>
                     </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Задания олимпиады</h5>
+                        <div class="list-group">
+                            <div th:each="task : ${tasks}" class="list-group-item">
+                                <h6 class="mb-1" th:text="${task.title}">Название задания</h6>
+                                <p class="mb-1" th:text="${task.taskText}">Описание задания</p>
+                                <small>Максимальный балл: <span th:text="${task.maxScore}"></span></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <a th:href="@{/login}" class="btn btn-primary">Войти для участия</a>
+                    <a th:href="@{/register}" class="btn btn-secondary">Зарегистрироваться</a>
+                    <a th:href="@{/olympiads}" class="btn btn-outline-secondary">Вернуться к списку олимпиад</a>
                 </div>
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html> 

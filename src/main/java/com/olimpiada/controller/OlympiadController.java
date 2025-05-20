@@ -19,11 +19,4 @@ public class OlympiadController {
         model.addAttribute("olympiads", olympiadService.findAll());
         return "olympiads/list";
     }
-
-    @GetMapping("/{id}")
-    public String viewOlympiad(@PathVariable Long id, Model model) {
-        Olympiad olympiad = olympiadService.findById(id);
-        model.addAttribute("olympiad", olympiad);
-        return "olympiads/view";
-    }
 } 

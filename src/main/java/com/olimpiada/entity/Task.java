@@ -30,4 +30,59 @@ public class Task {
     @ManyToOne
     @JoinColumn(name = "olympiad_id", nullable = false)
     private Olympiad olympiad;
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getTaskText() {
+        return taskText;
+    }
+
+    public void setTaskText(String taskText) {
+        this.taskText = taskText;
+    }
+
+    public Integer getMaxScore() {
+        return maxScore;
+    }
+
+    public void setMaxScore(Integer maxScore) {
+        this.maxScore = maxScore;
+    }
+
+    public TaskType getTaskType() {
+        return taskType;
+    }
+
+    public void setTaskType(TaskType taskType) {
+        this.taskType = taskType;
+    }
+
+    public String getCorrectAnswer() {
+        return correctAnswer;
+    }
+
+    public void setCorrectAnswer(String correctAnswer) {
+        this.correctAnswer = correctAnswer;
+    }
+
+    public Olympiad getOlympiad() {
+        return olympiad;
+    }
+
+    public void setOlympiad(Olympiad olympiad) {
+        this.olympiad = olympiad;
+    }
 } 

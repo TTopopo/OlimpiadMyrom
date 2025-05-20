@@ -8,12 +8,18 @@ import org.springframework.ui.Model;
 import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.olimpiada.service.OlympiadService;
+import com.olimpiada.entity.Olympiad;
+import com.olimpiada.service.TaskService;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 public class HomeController {
 
     @Autowired
     private OlympiadService olympiadService;
+
+    @Autowired
+    private TaskService taskService;
 
     @GetMapping("/")
     public String home(Model model) {
@@ -28,22 +34,34 @@ public class HomeController {
 
     @GetMapping("/start")
     public String start(Model model) {
-        LocalDateTime now = LocalDateTime.now();
-        model.addAttribute("title", "Начать участие");
-        model.addAttribute("activeOlympiads", olympiadService.findActiveOlympiads(now));
-        model.addAttribute("upcomingOlympiads", olympiadService.findUpcomingOlympiads(now));
-        model.addAttribute("pastOlympiads", olympiadService.findPastOlympiads(now));
-        return "start";
+        return "redirect:/olympiads";
     }
 
     @GetMapping("/olympiads")
-    public String olympiads(Model model) {
+    public String listOlympiads(Model model) {
         LocalDateTime now = LocalDateTime.now();
         model.addAttribute("title", "Олимпиады");
         model.addAttribute("activeOlympiads", olympiadService.findActiveOlympiads(now));
         model.addAttribute("upcomingOlympiads", olympiadService.findUpcomingOlympiads(now));
         model.addAttribute("pastOlympiads", olympiadService.findPastOlympiads(now));
-        return "olympiads";
+        return "olympiads/list";
+    }
+
+    @GetMapping("/olympiads/{id}")
+    public String viewOlympiad(@PathVariable Long id, Model model, Authentication authentication) {
+        Olympiad olympiad = olympiadService.findById(id);
+        if (olympiad.getEndDate().isBefore(LocalDateTime.now())) {
+            return "redirect:/olympiads";
+        }
+        
+        model.addAttribute("olympiad", olympiad);
+        model.addAttribute("tasks", taskService.getTasksByOlympiadId(id));
+        
+        if (authentication != null && authentication.isAuthenticated()) {
+            return "user/olympiad/view";
+        } else {
+            return "olympiads/view";
+        }
     }
 
     @GetMapping("/results")

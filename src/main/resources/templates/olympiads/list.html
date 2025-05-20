@@ -1,1 +1,116 @@
- 
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Олимпиады</title>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Олимпиады МИ ВлГУ</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
+                        <a class="nav-link" th:href="@{/user/profile}">
+                            <i class="bi bi-person-circle"></i>
+                            <span th:text="${#authorization.expression('hasRole(''ADMIN'')') ? 'Администратор' : (#authentication.principal.fullName != null ? #authentication.principal.fullName : #authentication.name)}"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
+                        <a class="nav-link" th:href="@{/logout}">Выйти</a>
+                    </li>
+                    <li class="nav-item" th:unless="${#authorization.expression('isAuthenticated()')}">
+                        <a class="nav-link" th:href="@{/login}">Войти</a>
+                    </li>
+                    <li class="nav-item" th:unless="${#authorization.expression('isAuthenticated()')}">
+                        <a class="nav-link" th:href="@{/register}">Регистрация</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2 class="mb-4">Доступные олимпиады</h2>
+
+        <!-- Активные олимпиады -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h3 class="h5 mb-0">Активные олимпиады</h3>
+            </div>
+            <div class="card-body">
+                <div th:if="${activeOlympiads.empty}" class="alert alert-info">
+                    В данный момент нет активных олимпиад
+                </div>
+                <div th:each="olympiad : ${activeOlympiads}" class="card mb-3">
+                    <div class="card-body">
+                        <h4 class="card-title" th:text="${olympiad.name}">Название олимпиады</h4>
+                        <p class="card-text">
+                            <strong>Сроки проведения:</strong><br>
+                            Начало: <span th:text="${#temporals.format(olympiad.startDate, 'dd.MM.yyyy HH:mm')}"></span><br>
+                            Окончание: <span th:text="${#temporals.format(olympiad.endDate, 'dd.MM.yyyy HH:mm')}"></span>
+                        </p>
+                        <a th:href="@{/user/olympiad/{id}(id=${olympiad.id})}" class="btn btn-primary">Участвовать</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Предстоящие олимпиады -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h3 class="h5 mb-0">Предстоящие олимпиады</h3>
+            </div>
+            <div class="card-body">
+                <div th:if="${upcomingOlympiads.empty}" class="alert alert-info">
+                    Нет предстоящих олимпиад
+                </div>
+                <div th:each="olympiad : ${upcomingOlympiads}" class="card mb-3">
+                    <div class="card-body">
+                        <h4 class="card-title" th:text="${olympiad.name}">Название олимпиады</h4>
+                        <p class="card-text">
+                            <strong>Сроки проведения:</strong><br>
+                            Начало: <span th:text="${#temporals.format(olympiad.startDate, 'dd.MM.yyyy HH:mm')}"></span><br>
+                            Окончание: <span th:text="${#temporals.format(olympiad.endDate, 'dd.MM.yyyy HH:mm')}"></span>
+                        </p>
+                        <a th:href="@{/olympiads/{id}(id=${olympiad.id})}" class="btn btn-outline-primary">Подробнее</a>
+                        <form th:action="@{/api/participations/olympiad/{olympiadId}(olympiadId=${olympiad.id})}" method="post" style="display:inline-block; margin-left: 10px;">
+                            <button type="submit" class="btn btn-success">Записаться на участие</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Завершенные олимпиады -->
+        <div class="card mb-4">
+            <div class="card-header bg-secondary text-white">
+                <h3 class="h5 mb-0">Завершенные олимпиады</h3>
+            </div>
+            <div class="card-body">
+                <div th:if="${pastOlympiads.empty}" class="alert alert-info">
+                    Нет завершенных олимпиад
+                </div>
+                <div th:each="olympiad : ${pastOlympiads}" class="card mb-3">
+                    <div class="card-body">
+                        <h4 class="card-title" th:text="${olympiad.name}">Название олимпиады</h4>
+                        <p class="card-text">
+                            <strong>Сроки проведения:</strong><br>
+                            Начало: <span th:text="${#temporals.format(olympiad.startDate, 'dd.MM.yyyy HH:mm')}"></span><br>
+                            Окончание: <span th:text="${#temporals.format(olympiad.endDate, 'dd.MM.yyyy HH:mm')}"></span>
+                        </p>
+                        <a th:href="@{/user/olympiad/{id}/results(id=${olympiad.id})}" class="btn btn-outline-secondary">Результаты</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

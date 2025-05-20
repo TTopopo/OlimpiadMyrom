@@ -16,13 +16,13 @@ public class Olympiad {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(length = 1000)
     private String description;
 
-    @Column(nullable = false)
+    @Column(name = "start_date", nullable = false)
     private LocalDateTime startDate;
 
-    @Column(nullable = false)
+    @Column(name = "end_date", nullable = false)
     private LocalDateTime endDate;
 
     @Column(nullable = false)
@@ -31,6 +31,13 @@ public class Olympiad {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private OlympiadStatus status = OlympiadStatus.DRAFT;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CourseType educationLevel;
+
+    @Column(nullable = false)
+    private Integer courseNumber;
 
     @OneToMany(mappedBy = "olympiad", cascade = CascadeType.ALL)
     private List<Task> tasks;
@@ -122,5 +129,21 @@ public class Olympiad {
 
     public void setStatus(OlympiadStatus status) {
         this.status = status;
+    }
+
+    public CourseType getEducationLevel() {
+        return educationLevel;
+    }
+
+    public void setEducationLevel(CourseType educationLevel) {
+        this.educationLevel = educationLevel;
+    }
+
+    public Integer getCourseNumber() {
+        return courseNumber;
+    }
+
+    public void setCourseNumber(Integer courseNumber) {
+        this.courseNumber = courseNumber;
     }
 } 

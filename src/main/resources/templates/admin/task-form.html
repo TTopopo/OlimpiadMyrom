@@ -9,6 +9,8 @@
     <div class="container mt-5">
         <h2 th:text="${task.id == null ? 'Добавление задания' : 'Редактирование задания'}"></h2>
         
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+        
         <form th:action="${task.id == null ? '/admin/tasks/add' : '/admin/tasks/edit/' + task.id}" 
               method="post" 
               th:object="${task}"
@@ -129,6 +131,63 @@
 
         // Показать соответствующие поля при загрузке страницы
         document.addEventListener('DOMContentLoaded', showAnswerFields);
+
+        function validateTaskForm(e) {
+            const title = document.getElementById('title').value.trim();
+            const taskText = document.getElementById('taskText').value.trim();
+            const maxScore = document.getElementById('maxScore').value;
+            const taskType = document.getElementById('taskType').value;
+            if (!title || !taskText || !maxScore || !taskType) {
+                alert('Заполните все обязательные поля!');
+                e.preventDefault();
+                return;
+            }
+            if (taskType === 'SINGLE_CHOICE') {
+                const answers = document.querySelectorAll('#singleChoiceFields input[name="answers"]');
+                const correct = document.querySelectorAll('#singleChoiceFields input[name="correctAnswer"]:checked');
+                if (answers.length < 2) {
+                    alert('Добавьте минимум два варианта ответа!');
+                    e.preventDefault();
+                    return;
+                }
+                if (correct.length !== 1) {
+                    alert('Выберите ровно один правильный ответ!');
+                    e.preventDefault();
+                    return;
+                }
+            }
+            if (taskType === 'MULTIPLE_CHOICE') {
+                const answers = document.querySelectorAll('#multipleChoiceFields input[name="answers"]');
+                const correct = document.querySelectorAll('#multipleChoiceFields input[name="correctAnswers"]:checked');
+                if (answers.length < 2) {
+                    alert('Добавьте минимум два варианта ответа!');
+                    e.preventDefault();
+                    return;
+                }
+                if (correct.length < 1) {
+                    alert('Выберите хотя бы один правильный ответ!');
+                    e.preventDefault();
+                    return;
+                }
+            }
+            if (taskType === 'TEXT_ANSWER') {
+                const answer = document.querySelector('textarea[name="correctTextAnswer"]').value.trim();
+                if (!answer) {
+                    alert('Введите правильный текстовый ответ!');
+                    e.preventDefault();
+                    return;
+                }
+            }
+            if (taskType === 'CODE_ANSWER') {
+                const answer = document.querySelector('textarea[name="correctCodeAnswer"]').value.trim();
+                if (!answer) {
+                    alert('Введите правильный код-ответ!');
+                    e.preventDefault();
+                    return;
+                }
+            }
+        }
+        document.querySelector('form').addEventListener('submit', validateTaskForm);
     </script>
 </body>
 </html> 

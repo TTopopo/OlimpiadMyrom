@@ -1,5 +1,6 @@
 package com.olimpiada.service;
 
+import com.olimpiada.entity.CourseType;
 import com.olimpiada.entity.Olympiad;
 import com.olimpiada.repository.OlympiadRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ public class OlympiadService {
     
     public Olympiad findById(Long id) {
         return olympiadRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Olympiad not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException("Олимпиада не найдена"));
     }
     
     public Olympiad save(Olympiad olympiad) {

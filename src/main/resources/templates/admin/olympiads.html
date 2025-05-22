@@ -57,7 +57,7 @@
                     <td>
                         <a th:href="@{/admin/olympiads/edit/{id}(id=${olympiad.id})}" class="btn btn-warning">Редактировать</a>
                         <a th:href="@{/admin/olympiads/delete/{id}(id=${olympiad.id})}" class="btn btn-danger">Удалить</a>
-                        <a th:href="@{/admin/tasks/list/{olympiadId}(olympiadId=${olympiad.id})}" class="btn btn-success">Список заданий</a>
+                        <a th:href="@{/admin/tasks/olympiad/{olympiadId}(olympiadId=${olympiad.id})}" class="btn btn-success">Список заданий</a>
                     </td>
                 </tr>
             </tbody>

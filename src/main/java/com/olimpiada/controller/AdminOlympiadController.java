@@ -98,9 +98,7 @@ public class AdminOlympiadController {
 
     @GetMapping("/{id}")
     public String showOlympiadDetails(@PathVariable Long id, Model model) {
-        Olympiad olympiad = olympiadService.findById(id);
-        model.addAttribute("olympiad", olympiad);
-        return "admin/olympiad-details";
+        return "redirect:/admin/tasks/olympiad/" + id;
     }
 
     private String validateEducationAndCourse(String educationLevel, Integer courseNumber) {

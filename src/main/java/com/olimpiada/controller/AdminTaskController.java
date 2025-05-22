@@ -5,6 +5,8 @@ import com.olimpiada.entity.TaskType;
 import com.olimpiada.entity.Olympiad;
 import com.olimpiada.service.TaskService;
 import com.olimpiada.service.OlympiadService;
+import com.olimpiada.repository.AnswerRepository;
+import com.olimpiada.entity.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,6 +27,9 @@ public class AdminTaskController {
     @Autowired
     private OlympiadService olympiadService;
 
+    @Autowired
+    private AnswerRepository answerRepository;
+
     @GetMapping("/add")
     public String showAddForm(@RequestParam Long olympiadId, Model model) {
         Task task = new Task();
@@ -38,13 +43,28 @@ public class AdminTaskController {
 
     @PostMapping("/add")
     public String addTask(@ModelAttribute Task task,
+                         @RequestParam Long olympiadId,
                          @RequestParam(required = false) List<String> answers,
                          @RequestParam(required = false) Integer correctAnswer,
                          @RequestParam(required = false) List<Integer> correctAnswers,
                          @RequestParam(required = false) String correctTextAnswer,
                          @RequestParam(required = false) String correctCodeAnswer,
+                         Model model,
                          RedirectAttributes redirectAttributes) {
+        String error = validateTask(task, answers, correctAnswer, correctAnswers, correctTextAnswer, correctCodeAnswer);
+        if (error != null) {
+            model.addAttribute("task", task);
+            model.addAttribute("taskTypes", Arrays.asList(TaskType.values()));
+            model.addAttribute("error", error);
+            return "admin/task-form";
+        }
         try {
+            Olympiad olympiad = olympiadService.findById(olympiadId);
+            task.setOlympiad(olympiad);
+            // Сохраняем все варианты в options
+            if (answers != null && !answers.isEmpty()) {
+                task.setOptions(String.join(";", answers));
+            }
             // Устанавливаем правильные ответы в зависимости от типа задания
             switch (task.getTaskType()) {
                 case SINGLE_CHOICE:
@@ -79,7 +99,7 @@ public class AdminTaskController {
             return "redirect:/admin/olympiads/" + task.getOlympiad().getId();
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Ошибка при добавлении задания: " + e.getMessage());
-            return "redirect:/admin/tasks/add?olympiadId=" + task.getOlympiad().getId();
+            return "redirect:/admin/tasks/add?olympiadId=" + olympiadId;
         }
     }
 
@@ -88,6 +108,29 @@ public class AdminTaskController {
         Task task = taskService.getTaskById(id);
         model.addAttribute("task", task);
         model.addAttribute("taskTypes", Arrays.asList(TaskType.values()));
+        List<String> options = new java.util.ArrayList<>();
+        List<String> correctAnswers = new java.util.ArrayList<>();
+        if (task.getTaskType() == TaskType.SINGLE_CHOICE || task.getTaskType() == TaskType.MULTIPLE_CHOICE) {
+            if (task.getOptions() != null && !task.getOptions().isEmpty()) {
+                options = java.util.Arrays.asList(task.getOptions().split(";"));
+            }
+            if (task.getCorrectAnswer() != null && !task.getCorrectAnswer().isEmpty()) {
+                if (task.getTaskType() == TaskType.SINGLE_CHOICE) {
+                    correctAnswers = java.util.List.of(task.getCorrectAnswer());
+                } else {
+                    correctAnswers = java.util.Arrays.asList(task.getCorrectAnswer().split(";"));
+                }
+            }
+        }
+        model.addAttribute("options", options);
+        model.addAttribute("correctAnswers", correctAnswers);
+        // Для текстового и кодового ответа
+        if (task.getTaskType() == TaskType.TEXT_ANSWER) {
+            model.addAttribute("correctTextAnswer", task.getCorrectAnswer());
+        }
+        if (task.getTaskType() == TaskType.CODE_ANSWER) {
+            model.addAttribute("correctCodeAnswer", task.getCorrectAnswer());
+        }
         return "admin/task-form";
     }
 
@@ -99,14 +142,25 @@ public class AdminTaskController {
                            @RequestParam(required = false) List<Integer> correctAnswers,
                            @RequestParam(required = false) String correctTextAnswer,
                            @RequestParam(required = false) String correctCodeAnswer,
+                           Model model,
                            RedirectAttributes redirectAttributes) {
+        String error = validateTask(task, answers, correctAnswer, correctAnswers, correctTextAnswer, correctCodeAnswer);
+        if (error != null) {
+            model.addAttribute("task", task);
+            model.addAttribute("taskTypes", Arrays.asList(TaskType.values()));
+            model.addAttribute("error", error);
+            return "admin/task-form";
+        }
         try {
             Task existingTask = taskService.getTaskById(id);
             existingTask.setTitle(task.getTitle());
             existingTask.setTaskText(task.getTaskText());
             existingTask.setMaxScore(task.getMaxScore());
             existingTask.setTaskType(task.getTaskType());
-
+            // Сохраняем все варианты в options
+            if (answers != null && !answers.isEmpty()) {
+                existingTask.setOptions(String.join(";", answers));
+            }
             // Устанавливаем правильные ответы в зависимости от типа задания
             switch (task.getTaskType()) {
                 case SINGLE_CHOICE:
@@ -162,8 +216,34 @@ public class AdminTaskController {
     @GetMapping("/olympiad/{olympiadId}")
     public String listTasksByOlympiad(@PathVariable Long olympiadId, Model model) {
         List<Task> tasks = taskService.getTasksByOlympiadId(olympiadId);
+        Olympiad olympiad = olympiadService.findById(olympiadId);
         model.addAttribute("tasks", tasks);
+        model.addAttribute("olympiad", olympiad);
         model.addAttribute("olympiadId", olympiadId);
         return "admin/task-list";
+    }
+
+    private String validateTask(Task task, List<String> answers, Integer correctAnswer, List<Integer> correctAnswers, String correctTextAnswer, String correctCodeAnswer) {
+        if (task.getTitle() == null || task.getTitle().trim().isEmpty()) return "Название задания обязательно";
+        if (task.getTaskText() == null || task.getTaskText().trim().isEmpty()) return "Описание задания обязательно";
+        if (task.getMaxScore() == null || task.getMaxScore() <= 0) return "Максимальный балл должен быть больше 0";
+        if (task.getTaskType() == null) return "Тип задания обязателен";
+        switch (task.getTaskType()) {
+            case SINGLE_CHOICE:
+                if (answers == null || answers.size() < 2) return "Добавьте минимум два варианта ответа";
+                if (correctAnswer == null || correctAnswer < 0 || correctAnswer >= answers.size()) return "Выберите правильный ответ";
+                break;
+            case MULTIPLE_CHOICE:
+                if (answers == null || answers.size() < 2) return "Добавьте минимум два варианта ответа";
+                if (correctAnswers == null || correctAnswers.isEmpty()) return "Выберите хотя бы один правильный ответ";
+                break;
+            case TEXT_ANSWER:
+                if (correctTextAnswer == null || correctTextAnswer.trim().isEmpty()) return "Введите правильный текстовый ответ";
+                break;
+            case CODE_ANSWER:
+                if (correctCodeAnswer == null || correctCodeAnswer.trim().isEmpty()) return "Введите правильный код-ответ";
+                break;
+        }
+        return null;
     }
 } 

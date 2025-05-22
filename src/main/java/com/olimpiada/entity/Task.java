@@ -27,9 +27,13 @@ public class Task {
     @Column(name = "correct_answer", columnDefinition = "TEXT")
     private String correctAnswer;
 
+    @Column(name = "options", columnDefinition = "TEXT")
+    private String options;
+
     @ManyToOne
     @JoinColumn(name = "olympiad_id", nullable = false)
     private Olympiad olympiad;
+
     public Long getId() {
         return id;
     }
@@ -76,6 +80,14 @@ public class Task {
 
     public void setCorrectAnswer(String correctAnswer) {
         this.correctAnswer = correctAnswer;
+    }
+
+    public String getOptions() {
+        return options;
+    }
+
+    public void setOptions(String options) {
+        this.options = options;
     }
 
     public Olympiad getOlympiad() {

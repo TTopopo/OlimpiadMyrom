@@ -2,10 +2,32 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Управление заданием</title>
+    <title th:text="${task.id == null ? 'Добавление задания' : 'Редактирование задания'}"></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
 <body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">Олимпиады МИ ВлГУ</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle"></i>
+                        <span th:text="${#authentication.principal.fullName != null ? #authentication.principal.fullName : #authentication.name}"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="/logout">Выйти</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
     <div class="container mt-5">
         <h2 th:text="${task.id == null ? 'Добавление задания' : 'Редактирование задания'}"></h2>
         
@@ -46,7 +68,14 @@
             <!-- Поля для ответов -->
             <div id="singleChoiceFields" class="answer-fields mb-3" style="display: none;">
                 <h4>Варианты ответов (один правильный)</h4>
-                <div class="mb-2">
+                <div th:if="${options != null and !options.isEmpty()}" th:each="option, iterStat : ${options}" class="mb-2">
+                    <input type="text" class="form-control mb-2" name="answers" placeholder="Вариант ответа" th:value="${option}">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="correctAnswer" th:value="${iterStat.index}" th:checked="${#lists.contains(correctAnswers, option)}">
+                        <label class="form-check-label">Правильный ответ</label>
+                    </div>
+                </div>
+                <div th:if="${options == null or options.isEmpty()}" class="mb-2">
                     <input type="text" class="form-control mb-2" name="answers" placeholder="Вариант ответа">
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="correctAnswer" value="0">
@@ -58,7 +87,14 @@
 
             <div id="multipleChoiceFields" class="answer-fields mb-3" style="display: none;">
                 <h4>Варианты ответов (несколько правильных)</h4>
-                <div class="mb-2">
+                <div th:if="${options != null and !options.isEmpty()}" th:each="option, iterStat : ${options}" class="mb-2">
+                    <input type="text" class="form-control mb-2" name="answers" placeholder="Вариант ответа" th:value="${option}">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="correctAnswers" th:value="${iterStat.index}" th:checked="${#lists.contains(correctAnswers, option)}">
+                        <label class="form-check-label">Правильный ответ</label>
+                    </div>
+                </div>
+                <div th:if="${options == null or options.isEmpty()}" class="mb-2">
                     <input type="text" class="form-control mb-2" name="answers" placeholder="Вариант ответа">
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="correctAnswers" value="0">
@@ -70,16 +106,17 @@
 
             <div id="textAnswerFields" class="answer-fields mb-3" style="display: none;">
                 <h4>Правильный ответ</h4>
-                <textarea class="form-control" name="correctTextAnswer" rows="3" placeholder="Введите правильный текстовый ответ"></textarea>
+                <textarea class="form-control" name="correctTextAnswer" rows="3" placeholder="Введите правильный текстовый ответ" th:text="${correctTextAnswer}"></textarea>
             </div>
 
             <div id="codeAnswerFields" class="answer-fields mb-3" style="display: none;">
                 <h4>Правильный ответ</h4>
-                <textarea class="form-control" name="correctCodeAnswer" rows="5" placeholder="Введите правильный код"></textarea>
+                <textarea class="form-control" name="correctCodeAnswer" rows="5" placeholder="Введите правильный код" th:text="${correctCodeAnswer}"></textarea>
                 <div class="form-text">Используйте markdown для форматирования кода</div>
             </div>
             
             <div class="d-flex gap-2">
+                <button type="button" class="btn btn-outline-secondary" onclick="history.back()">Назад</button>
                 <button type="submit" class="btn btn-primary">Сохранить</button>
                 <a th:href="@{/admin/olympiads/{id}(id=${task.olympiad.id})}" class="btn btn-secondary">Отмена</a>
             </div>

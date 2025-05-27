@@ -39,11 +39,10 @@ public class HomeController {
 
     @GetMapping("/olympiads")
     public String listOlympiads(Model model) {
-        LocalDateTime now = LocalDateTime.now();
         model.addAttribute("title", "Олимпиады");
-        model.addAttribute("activeOlympiads", olympiadService.findActiveOlympiads(now));
-        model.addAttribute("upcomingOlympiads", olympiadService.findUpcomingOlympiads(now));
-        model.addAttribute("pastOlympiads", olympiadService.findPastOlympiads(now));
+        model.addAttribute("activeOlympiads", olympiadService.findActiveOlympiads());
+        model.addAttribute("upcomingOlympiads", olympiadService.findUpcomingOlympiads(java.time.LocalDateTime.now()));
+        model.addAttribute("pastOlympiads", olympiadService.findPastOlympiads(java.time.LocalDateTime.now()));
         return "olympiads/list";
     }
 

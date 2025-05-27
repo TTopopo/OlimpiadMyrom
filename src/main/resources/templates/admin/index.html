@@ -5,69 +5,81 @@
     <meta charset="UTF-8">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        html, body { height: 100%; }
+        body { min-height: 100vh; display: flex; flex-direction: column; }
+        .main-content { flex: 1 0 auto; }
+        footer { flex-shrink: 0; background: #212529; color: #fff; border-top: 1px solid #343a40; text-align: center; padding: 12px 0 10px 0; font-size: 1rem; width: 100%; position: static; margin-top: 0; }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="/">Олимпиады МИ ВлГУ</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/logout}">Выйти</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container mt-4">
-        <h2 class="mb-4">Панель администратора</h2>
-
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <i class="bi bi-trophy"></i>
-                            Рейтинг участников
-                        </h5>
-                        <p class="card-text">Просмотр рейтинга участников и присвоение мест победителям.</p>
-                        <a th:href="@{/admin/rating}" class="btn btn-primary">Перейти к рейтингу</a>
-                    </div>
+    <div class="main-content">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="/">Олимпиады МИ ВлГУ</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/logout}">Выйти</a>
+                        </li>
+                    </ul>
                 </div>
             </div>
+        </nav>
 
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <i class="bi bi-list-check"></i>
-                            Управление олимпиадами
-                        </h5>
-                        <p class="card-text">Создание и редактирование олимпиад, управление заданиями.</p>
-                        <a th:href="@{/admin/olympiads}" class="btn btn-primary">Управление олимпиадами</a>
+        <div class="container mt-4">
+            <h2 class="mb-4">Панель администратора</h2>
+
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-trophy"></i>
+                                Рейтинг участников
+                            </h5>
+                            <p class="card-text">Просмотр рейтинга участников и присвоение мест победителям.</p>
+                            <a th:href="@{/admin/rating}" class="btn btn-primary">Перейти к рейтингу</a>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <i class="bi bi-check-circle"></i>
-                            Проверка ответов
-                        </h5>
-                        <p class="card-text">Проверка и оценка ответов участников олимпиад.</p>
-                        <a th:href="@{/admin/answers}" class="btn btn-primary">Проверить ответы</a>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-list-check"></i>
+                                Управление олимпиадами
+                            </h5>
+                            <p class="card-text">Создание и редактирование олимпиад, управление заданиями.</p>
+                            <a th:href="@{/admin/olympiads}" class="btn btn-primary">Управление олимпиадами</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-check-circle"></i>
+                                Проверка ответов
+                            </h5>
+                            <p class="card-text">Проверка и оценка ответов участников олимпиад.</p>
+                            <a th:href="@{/admin/answers}" class="btn btn-primary">Проверить ответы</a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
+    <footer class="bg-dark text-white py-4">
+        <div class="container text-center">
+            <p>&copy; 2025 Олимпиады Муромского Института ВлГУ. Все права защищены.</p>
+        </div>
+    </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html> 

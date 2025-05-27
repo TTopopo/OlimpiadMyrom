@@ -2,41 +2,49 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${task.id == null ? 'Добавление задания' : 'Редактирование задания'}"></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        html, body { height: 100%; }
+        body { min-height: 100vh; display: flex; flex-direction: column; }
+        .main-content { flex: 1 0 auto; }
+        /* form { max-width: 700px; margin: 0 auto; } */
+        .form-actions { margin-bottom: 32px; }
+        .d-flex.gap-2 {
+            flex-wrap: wrap;
+        }
+        footer { flex-shrink: 0; background: #212529; color: #fff; border-top: 1px solid #343a40; text-align: center; padding: 12px 0 10px 0; font-size: 1rem; width: 100%; position: static; margin-top: 0; }
+    </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-        <a class="navbar-brand" href="/">Олимпиады МИ ВлГУ</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-person-circle"></i>
-                        <span th:text="${#authentication.principal.fullName != null ? #authentication.principal.fullName : #authentication.name}"></span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="/logout">Выйти</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+<div th:replace="~{fragments/header :: header}"></div>
+<div class="main-content">
     <div class="container mt-5">
         <h2 th:text="${task.id == null ? 'Добавление задания' : 'Редактирование задания'}"></h2>
         
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
         
+        <!-- Bootstrap Toast для ошибок валидации -->
+        <div aria-live="polite" aria-atomic="true" style="position: fixed; bottom: 1rem; right: 1rem; min-width: 300px; z-index: 9999;">
+            <div class="toast align-items-center bg-danger text-white border-0" id="validationToast" role="alert" aria-live="assertive" aria-atomic="true" style="display:none;">
+                <div class="d-flex">
+                    <div class="toast-body" id="validationToastBody">
+                        <!-- JS заполнит -->
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+        
         <form th:action="${task.id == null ? '/admin/tasks/add' : '/admin/tasks/edit/' + task.id}" 
               method="post" 
               th:object="${task}"
               class="mt-4">
+            <a href="/admin/olympiads" class="btn btn-outline-secondary mb-3">
+                <i class="bi bi-arrow-left"></i> Назад
+            </a>
             
             <input type="hidden" name="olympiadId" th:value="${task.olympiad.id}">
             
@@ -68,17 +76,14 @@
             <!-- Поля для ответов -->
             <div id="singleChoiceFields" class="answer-fields mb-3" style="display: none;">
                 <h4>Варианты ответов (один правильный)</h4>
-                <div th:if="${options != null and !options.isEmpty()}" th:each="option, iterStat : ${options}" class="mb-2">
-                    <input type="text" class="form-control mb-2" name="answers" placeholder="Вариант ответа" th:value="${option}">
+                <div th:if="${options != null and !options.isEmpty()}" th:each="option, iterStat : ${options}" class="mb-2 answer-option">
+                    <div class="input-group mb-2">
+                        <input type="text" class="form-control" name="answers" placeholder="Вариант ответа" th:value="${option}">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="clearInputField(this)" title="Очистить"><i class="bi bi-eraser"></i></button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeAnswerField(this)" title="Удалить вариант"><i class="bi bi-x"></i></button>
+                    </div>
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="correctAnswer" th:value="${iterStat.index}" th:checked="${#lists.contains(correctAnswers, option)}">
-                        <label class="form-check-label">Правильный ответ</label>
-                    </div>
-                </div>
-                <div th:if="${options == null or options.isEmpty()}" class="mb-2">
-                    <input type="text" class="form-control mb-2" name="answers" placeholder="Вариант ответа">
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="correctAnswer" value="0">
                         <label class="form-check-label">Правильный ответ</label>
                     </div>
                 </div>
@@ -87,17 +92,14 @@
 
             <div id="multipleChoiceFields" class="answer-fields mb-3" style="display: none;">
                 <h4>Варианты ответов (несколько правильных)</h4>
-                <div th:if="${options != null and !options.isEmpty()}" th:each="option, iterStat : ${options}" class="mb-2">
-                    <input type="text" class="form-control mb-2" name="answers" placeholder="Вариант ответа" th:value="${option}">
+                <div th:if="${options != null and !options.isEmpty()}" th:each="option, iterStat : ${options}" class="mb-2 answer-option">
+                    <div class="input-group mb-2">
+                        <input type="text" class="form-control" name="answers" placeholder="Вариант ответа" th:value="${option}">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="clearInputField(this)" title="Очистить"><i class="bi bi-eraser"></i></button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeAnswerField(this)" title="Удалить вариант"><i class="bi bi-x"></i></button>
+                    </div>
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="correctAnswers" th:value="${iterStat.index}" th:checked="${#lists.contains(correctAnswers, option)}">
-                        <label class="form-check-label">Правильный ответ</label>
-                    </div>
-                </div>
-                <div th:if="${options == null or options.isEmpty()}" class="mb-2">
-                    <input type="text" class="form-control mb-2" name="answers" placeholder="Вариант ответа">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="correctAnswers" value="0">
                         <label class="form-check-label">Правильный ответ</label>
                     </div>
                 </div>
@@ -115,46 +117,92 @@
                 <div class="form-text">Используйте markdown для форматирования кода</div>
             </div>
             
-            <div class="d-flex gap-2">
-                <button type="button" class="btn btn-outline-secondary" onclick="history.back()">Назад</button>
+            <div class="d-flex gap-2 form-actions">
                 <button type="submit" class="btn btn-primary">Сохранить</button>
-                <a th:href="@{/admin/olympiads/{id}(id=${task.olympiad.id})}" class="btn btn-secondary">Отмена</a>
+                <a href="javascript:history.back()" class="btn btn-secondary">Отмена</a>
             </div>
         </form>
     </div>
-    
+</div>
+<footer class="bg-dark text-white py-4">
+    <div class="container text-center">
+        <p>&copy; 2025 Олимпиады Муромского Института ВлГУ. Все права защищены.</p>
+    </div>
+</footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function showAnswerFields() {
             // Скрыть все поля ответов
             document.querySelectorAll('.answer-fields').forEach(field => field.style.display = 'none');
-            
-            // Показать нужные поля в зависимости от выбранного типа
             const taskType = document.getElementById('taskType').value;
-            switch(taskType) {
-                case 'SINGLE_CHOICE':
-                    document.getElementById('singleChoiceFields').style.display = 'block';
-                    break;
-                case 'MULTIPLE_CHOICE':
-                    document.getElementById('multipleChoiceFields').style.display = 'block';
-                    break;
-                case 'TEXT_ANSWER':
-                    document.getElementById('textAnswerFields').style.display = 'block';
-                    break;
-                case 'CODE_ANSWER':
-                    document.getElementById('codeAnswerFields').style.display = 'block';
-                    break;
+            if (taskType === 'SINGLE_CHOICE') {
+                const container = document.getElementById('singleChoiceFields');
+                container.style.display = 'block';
+                // Если вариантов меньше 2, сбросить и сгенерировать 2 поля
+                if (container.querySelectorAll('.answer-option').length < 2) {
+                    container.querySelectorAll('.answer-option').forEach(e => e.remove());
+                    generateAnswerFields('singleChoiceFields', 2);
+                }
+            } else if (taskType === 'MULTIPLE_CHOICE') {
+                const container = document.getElementById('multipleChoiceFields');
+                container.style.display = 'block';
+                if (container.querySelectorAll('.answer-option').length < 3) {
+                    container.querySelectorAll('.answer-option').forEach(e => e.remove());
+                    generateAnswerFields('multipleChoiceFields', 3);
+                }
+            } else if (taskType === 'TEXT_ANSWER') {
+                document.getElementById('textAnswerFields').style.display = 'block';
+            } else if (taskType === 'CODE_ANSWER') {
+                document.getElementById('codeAnswerFields').style.display = 'block';
             }
+        }
+
+        function resetAnswerFields() {
+            // Очищаем варианты ответов для single/multiple
+            const single = document.getElementById('singleChoiceFields');
+            const multiple = document.getElementById('multipleChoiceFields');
+            if (single) {
+                single.querySelectorAll('.answer-option').forEach(e => e.remove());
+            }
+            if (multiple) {
+                multiple.querySelectorAll('.answer-option').forEach(e => e.remove());
+            }
+        }
+
+        function generateAnswerFields(containerId, count) {
+            const container = document.getElementById(containerId);
+            for (let i = 0; i < count; i++) {
+                const newAnswerDiv = document.createElement('div');
+                newAnswerDiv.className = 'mb-2 answer-option';
+                newAnswerDiv.innerHTML = `
+                    <div class="input-group mb-2">
+                        <input type="text" class="form-control" name="answers" placeholder="Вариант ответа">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="clearInputField(this)" title="Очистить"><i class="bi bi-eraser"></i></button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeAnswerField(this)" title="Удалить вариант"><i class="bi bi-x"></i></button>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="${containerId === 'singleChoiceFields' ? 'radio' : 'checkbox'}" 
+                               name="${containerId === 'singleChoiceFields' ? 'correctAnswer' : 'correctAnswers'}" 
+                               value="${i}">
+                        <label class="form-check-label">Правильный ответ</label>
+                    </div>
+                `;
+                container.insertBefore(newAnswerDiv, container.lastElementChild);
+            }
+            updateRemoveButtons(containerId);
         }
 
         function addAnswerField(containerId) {
             const container = document.getElementById(containerId);
             const answerCount = container.querySelectorAll('input[name="answers"]').length;
-            
             const newAnswerDiv = document.createElement('div');
-            newAnswerDiv.className = 'mb-2';
+            newAnswerDiv.className = 'mb-2 answer-option';
             newAnswerDiv.innerHTML = `
-                <input type="text" class="form-control mb-2" name="answers" placeholder="Вариант ответа">
+                <div class="input-group mb-2">
+                    <input type="text" class="form-control" name="answers" placeholder="Вариант ответа">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="clearInputField(this)" title="Очистить"><i class="bi bi-eraser"></i></button>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removeAnswerField(this)" title="Удалить вариант"><i class="bi bi-x"></i></button>
+                </div>
                 <div class="form-check">
                     <input class="form-check-input" type="${containerId === 'singleChoiceFields' ? 'radio' : 'checkbox'}" 
                            name="${containerId === 'singleChoiceFields' ? 'correctAnswer' : 'correctAnswers'}" 
@@ -162,67 +210,88 @@
                     <label class="form-check-label">Правильный ответ</label>
                 </div>
             `;
-            
             container.insertBefore(newAnswerDiv, container.lastElementChild);
+            updateRemoveButtons(containerId);
+        }
+
+        function removeAnswerField(btn) {
+            const container = btn.closest('.answer-fields');
+            btn.closest('.answer-option').remove();
+            updateRemoveButtons(container.id);
+        }
+
+        function updateRemoveButtons(containerId) {
+            const container = document.getElementById(containerId);
+            const answerOptions = container.querySelectorAll('.answer-option');
+            let minCount = containerId === 'singleChoiceFields' ? 2 : 3;
+            answerOptions.forEach((option, idx) => {
+                const removeBtn = option.querySelector('.btn-danger');
+                if (answerOptions.length <= minCount) {
+                    removeBtn.disabled = true;
+                } else {
+                    removeBtn.disabled = false;
+                }
+            });
+        }
+
+        function clearInputField(btn) {
+            const input = btn.closest('.input-group').querySelector('input, textarea');
+            if (input) input.value = '';
         }
 
         // Показать соответствующие поля при загрузке страницы
         document.addEventListener('DOMContentLoaded', showAnswerFields);
 
+        // Заменяем showValidationAlert на toast
+        function showValidationAlert(message) {
+            const toastDiv = document.getElementById('validationToast');
+            const toastBody = document.getElementById('validationToastBody');
+            toastBody.textContent = message;
+            toastDiv.classList.add('bg-danger', 'text-white');
+            toastDiv.style.display = '';
+            var toast = new bootstrap.Toast(toastDiv, { delay: 3000 });
+            toast.show();
+        }
+        function hideValidationAlert() {
+            // Toast сам исчезает, ничего не делаем
+        }
+
         function validateTaskForm(e) {
-            const title = document.getElementById('title').value.trim();
-            const taskText = document.getElementById('taskText').value.trim();
-            const maxScore = document.getElementById('maxScore').value;
+            hideValidationAlert();
             const taskType = document.getElementById('taskType').value;
-            if (!title || !taskText || !maxScore || !taskType) {
-                alert('Заполните все обязательные поля!');
-                e.preventDefault();
-                return;
+            // Берём только видимые поля
+            const answerInputs = Array.from(document.querySelectorAll('.answer-fields:not([style*="none"]) input[name="answers"]'));
+            if (taskType === 'SINGLE_CHOICE' || taskType === 'MULTIPLE_CHOICE') {
+                let hasEmpty = false;
+                for (let input of answerInputs) {
+                    if (input.value.trim() === '') {
+                        hasEmpty = true;
+                        break;
+                    }
+                }
+                if (hasEmpty) {
+                    showValidationAlert('Поля вариантов ответа не должны быть пустыми!');
+                    e.preventDefault();
+                    return;
+                }
             }
+            // Проверка на правильные ответы
             if (taskType === 'SINGLE_CHOICE') {
-                const answers = document.querySelectorAll('#singleChoiceFields input[name="answers"]');
-                const correct = document.querySelectorAll('#singleChoiceFields input[name="correctAnswer"]:checked');
-                if (answers.length < 2) {
-                    alert('Добавьте минимум два варианта ответа!');
+                const checked = document.querySelectorAll('input[name="correctAnswer"]:checked').length;
+                if (checked !== 1) {
+                    showValidationAlert('Должен быть выбран ровно один правильный ответ!');
                     e.preventDefault();
                     return;
                 }
-                if (correct.length !== 1) {
-                    alert('Выберите ровно один правильный ответ!');
-                    e.preventDefault();
-                    return;
-                }
-            }
-            if (taskType === 'MULTIPLE_CHOICE') {
-                const answers = document.querySelectorAll('#multipleChoiceFields input[name="answers"]');
-                const correct = document.querySelectorAll('#multipleChoiceFields input[name="correctAnswers"]:checked');
-                if (answers.length < 2) {
-                    alert('Добавьте минимум два варианта ответа!');
-                    e.preventDefault();
-                    return;
-                }
-                if (correct.length < 1) {
-                    alert('Выберите хотя бы один правильный ответ!');
+            } else if (taskType === 'MULTIPLE_CHOICE') {
+                const checked = document.querySelectorAll('input[name="correctAnswers"]:checked').length;
+                if (checked < 2) {
+                    showValidationAlert('Должно быть выбрано минимум два правильных ответа!');
                     e.preventDefault();
                     return;
                 }
             }
-            if (taskType === 'TEXT_ANSWER') {
-                const answer = document.querySelector('textarea[name="correctTextAnswer"]').value.trim();
-                if (!answer) {
-                    alert('Введите правильный текстовый ответ!');
-                    e.preventDefault();
-                    return;
-                }
-            }
-            if (taskType === 'CODE_ANSWER') {
-                const answer = document.querySelector('textarea[name="correctCodeAnswer"]').value.trim();
-                if (!answer) {
-                    alert('Введите правильный код-ответ!');
-                    e.preventDefault();
-                    return;
-                }
-            }
+            // ... остальная валидация (если нужна) ...
         }
         document.querySelector('form').addEventListener('submit', validateTaskForm);
     </script>

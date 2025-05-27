@@ -57,4 +57,12 @@ public class OlympiadService {
     public List<Olympiad> findPastOlympiads(LocalDateTime now) {
         return olympiadRepository.findByEndDateBefore(now);
     }
+    
+    public List<Olympiad> searchOlympiads(String search) {
+        return olympiadRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(search, search);
+    }
+    
+    public List<Olympiad> findActiveOlympiads() {
+        return olympiadRepository.findByStatus(com.olimpiada.entity.OlympiadStatus.ACTIVE);
+    }
 } 

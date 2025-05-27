@@ -63,7 +63,13 @@ public class AdminTaskController {
             task.setOlympiad(olympiad);
             // Сохраняем все варианты в options
             if (answers != null && !answers.isEmpty()) {
-                task.setOptions(String.join(";", answers));
+                // Удаляем пустые и дублирующиеся варианты
+                List<String> filteredAnswers = answers.stream()
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .distinct()
+                    .toList();
+                task.setOptions(String.join(";", filteredAnswers));
             }
             // Устанавливаем правильные ответы в зависимости от типа задания
             switch (task.getTaskType()) {
@@ -159,7 +165,13 @@ public class AdminTaskController {
             existingTask.setTaskType(task.getTaskType());
             // Сохраняем все варианты в options
             if (answers != null && !answers.isEmpty()) {
-                existingTask.setOptions(String.join(";", answers));
+                // Удаляем пустые и дублирующиеся варианты
+                List<String> filteredAnswers = answers.stream()
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .distinct()
+                    .toList();
+                existingTask.setOptions(String.join(";", filteredAnswers));
             }
             // Устанавливаем правильные ответы в зависимости от типа задания
             switch (task.getTaskType()) {
@@ -214,8 +226,14 @@ public class AdminTaskController {
     }
 
     @GetMapping("/olympiad/{olympiadId}")
-    public String listTasksByOlympiad(@PathVariable Long olympiadId, Model model) {
-        List<Task> tasks = taskService.getTasksByOlympiadId(olympiadId);
+    public String listTasksByOlympiad(@PathVariable Long olympiadId, @RequestParam(value = "search", required = false) String search, Model model) {
+        List<Task> tasks;
+        if (search != null && !search.isEmpty()) {
+            tasks = taskService.searchTasksByOlympiad(olympiadId, search);
+            model.addAttribute("search", search);
+        } else {
+            tasks = taskService.getTasksByOlympiadId(olympiadId);
+        }
         Olympiad olympiad = olympiadService.findById(olympiadId);
         model.addAttribute("tasks", tasks);
         model.addAttribute("olympiad", olympiad);

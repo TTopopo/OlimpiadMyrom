@@ -18,7 +18,7 @@
                 <div th:each="task,iter : ${tasks}" class="card mb-4" th:attr="id='question-'+${iter.index}">
                     <div class="card-body">
                         <h5 class="card-title">Вопрос <span th:text="${iter.index+1}"></span>: <span th:text="${task.title}"></span></h5>
-                        <p class="card-text" th:text="${task.description}"></p>
+                        <p class="card-text" th:text="${task.taskText}"></p>
                         <p class="card-text">
                             <small class="text-muted">
                                 Максимальный балл: <span th:text="${task.maxScore}"></span>

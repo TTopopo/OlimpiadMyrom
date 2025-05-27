@@ -92,4 +92,27 @@ public class UserOlympiadController {
         model.addAttribute("results", results);
         return "results/user-list";
     }
+
+    @GetMapping("/{id}/active")
+    public String activeOlympiad(@PathVariable Long id, Model model, Authentication authentication) {
+        Olympiad olympiad = olympiadService.findById(id);
+        String email = authentication.getName();
+        User user = userService.findByEmail(email);
+        List<Task> tasks = taskService.getTasksByOlympiadId(id);
+        model.addAttribute("olympiad", olympiad);
+        model.addAttribute("tasks", tasks);
+        model.addAttribute("user", user);
+        return "user/olympiad/active";
+    }
+
+    @GetMapping("/{id}/start")
+    public String startOlympiad(@PathVariable Long id, Model model, Authentication authentication, @RequestParam(required = false) String error) {
+        Olympiad olympiad = olympiadService.findById(id);
+        String email = authentication.getName();
+        User user = userService.findByEmail(email);
+        model.addAttribute("olympiad", olympiad);
+        model.addAttribute("user", user);
+        model.addAttribute("error", error);
+        return "user/olympiad/start";
+    }
 } 

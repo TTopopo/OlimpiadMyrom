@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findByOlympiadId(Long olympiadId);
+    List<Task> findByOlympiadIdAndTitleContainingIgnoreCaseOrOlympiadIdAndTaskTextContainingIgnoreCase(Long olympiadId1, String title, Long olympiadId2, String taskText);
 } 

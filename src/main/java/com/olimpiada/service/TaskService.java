@@ -29,4 +29,8 @@ public class TaskService {
     public void deleteTask(Long id) {
         taskRepository.deleteById(id);
     }
+    
+    public List<Task> searchTasksByOlympiad(Long olympiadId, String search) {
+        return taskRepository.findByOlympiadIdAndTitleContainingIgnoreCaseOrOlympiadIdAndTaskTextContainingIgnoreCase(olympiadId, search, olympiadId, search);
+    }
 } 

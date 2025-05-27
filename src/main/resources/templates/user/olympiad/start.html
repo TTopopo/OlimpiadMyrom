@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${olympiad.name}">Олимпиада</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <h2 th:text="${olympiad.name}"></h2>
+    <div class="alert alert-warning mb-4">
+        <b>Время на выполнение:</b> 60 минут
+    </div>
+    <div th:if="${error} == 'already_registered'" class="alert alert-info">
+        Вы уже зарегистрированы на эту олимпиаду. Вы можете начать выполнение в любой момент!
+    </div>
+    <div class="d-flex gap-3">
+        <form th:action="@{'/user/olympiad/' + ${olympiad.id} + '/active'}" method="get">
+            <button type="submit" class="btn btn-success btn-lg">Начать участие</button>
+        </form>
+        <a href="/olympiads" class="btn btn-secondary btn-lg">Назад</a>
+    </div>
+</div>
+</body>
+</html> 

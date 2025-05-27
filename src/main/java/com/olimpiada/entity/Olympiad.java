@@ -2,10 +2,12 @@ package com.olimpiada.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
+@ToString(exclude = "tasks")
 @Entity
 @Table(name = "olympiads")
 public class Olympiad {

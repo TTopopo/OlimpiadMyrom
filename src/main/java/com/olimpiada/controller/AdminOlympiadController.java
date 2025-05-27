@@ -17,8 +17,13 @@ public class AdminOlympiadController {
     private OlympiadService olympiadService;
 
     @GetMapping
-    public String listOlympiads(Model model) {
-        model.addAttribute("olympiads", olympiadService.findAll());
+    public String listOlympiads(@RequestParam(value = "search", required = false) String search, Model model) {
+        if (search != null && !search.isEmpty()) {
+            model.addAttribute("olympiads", olympiadService.searchOlympiads(search));
+            model.addAttribute("search", search);
+        } else {
+            model.addAttribute("olympiads", olympiadService.findAll());
+        }
         return "admin/olympiads";
     }
 
@@ -91,8 +96,9 @@ public class AdminOlympiadController {
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteOlympiad(@PathVariable Long id) {
+    public String deleteOlympiad(@PathVariable Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         olympiadService.deleteById(id);
+        redirectAttributes.addFlashAttribute("success", "Олимпиада успешно удалена");
         return "redirect:/admin/olympiads";
     }
 

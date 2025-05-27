@@ -2,8 +2,10 @@ package com.olimpiada.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 @Data
+@ToString(exclude = "olympiad")
 @Entity
 @Table(name = "tasks")
 public class Task {
@@ -96,5 +98,14 @@ public class Task {
 
     public void setOlympiad(Olympiad olympiad) {
         this.olympiad = olympiad;
+    }
+
+    @jakarta.persistence.Transient
+    public java.util.List<String> getOptionsList() {
+        if (options == null || options.isEmpty()) return java.util.List.of();
+        return java.util.Arrays.stream(options.split(";"))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
     }
 } 

@@ -13,4 +13,6 @@ public interface OlympiadRepository extends JpaRepository<Olympiad, Long> {
     List<Olympiad> findByStartDateBeforeAndEndDateAfter(LocalDateTime start, LocalDateTime end);
     List<Olympiad> findByStartDateAfter(LocalDateTime start);
     List<Olympiad> findByEndDateBefore(LocalDateTime end);
+    List<Olympiad> findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String name, String description);
+    List<Olympiad> findByStatus(com.olimpiada.entity.OlympiadStatus status);
 } 

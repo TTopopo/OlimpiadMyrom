@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class ParticipationController {
     }
 
     @PostMapping("/olympiad/{olympiadId}")
-    public String registerForOlympiad(@PathVariable Long olympiadId) {
+    public String registerForOlympiad(@PathVariable Long olympiadId, RedirectAttributes redirectAttributes) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         User user = userRepository.findByEmail(email)
@@ -43,16 +44,34 @@ public class ParticipationController {
         Olympiad olympiad = olympiadRepository.findById(olympiadId)
             .orElseThrow(() -> new RuntimeException("Олимпиада не найдена"));
 
-        if (participationRepository.findByUserIdAndOlympiadId(user.getId(), olympiadId).isPresent()) {
-            return "redirect:/api/olympiads/" + olympiadId + "?error=already_registered";
-        }
+        boolean alreadyRegistered = participationRepository.findByUserIdAndOlympiadId(user.getId(), olympiadId).isPresent();
 
+        if (olympiad.getStatus() == com.olimpiada.entity.OlympiadStatus.ACTIVE) {
+            if (alreadyRegistered) {
+                return "redirect:/user/olympiad/" + olympiadId + "/start?error=already_registered";
+            } else {
+                Participation participation = new Participation();
+                participation.setUser(user);
+                participation.setOlympiad(olympiad);
+                participation.setRegistrationDate(java.time.LocalDateTime.now());
+                participationRepository.save(participation);
+                return "redirect:/user/olympiad/" + olympiadId + "/start";
+            }
+        } else {
+            if (alreadyRegistered) {
+                redirectAttributes.addAttribute("error", "already_registered");
+                return "redirect:/olympiads";
+            } else {
         Participation participation = new Participation();
         participation.setUser(user);
         participation.setOlympiad(olympiad);
+        participation.setRegistrationDate(java.time.LocalDateTime.now());
         participationRepository.save(participation);
-
-        return "redirect:/api/olympiads/" + olympiadId + "?success=registered";
+                redirectAttributes.addAttribute("success", "registered");
+                redirectAttributes.addAttribute("olympiadName", olympiad.getName());
+                return "redirect:/olympiads";
+            }
+        }
     }
 
     @GetMapping("/user")
@@ -74,5 +93,13 @@ public class ParticipationController {
         model.addAttribute("participations", participations);
         model.addAttribute("olympiadId", olympiadId);
         return "participations/participants";
+    }
+
+    @GetMapping("/olympiad/{olympiadId}/confirm")
+    public String confirmParticipation(@PathVariable Long olympiadId, Model model) {
+        Olympiad olympiad = olympiadRepository.findById(olympiadId)
+            .orElseThrow(() -> new RuntimeException("Олимпиада не найдена"));
+        model.addAttribute("olympiad", olympiad);
+        return "participations/confirm";
     }
 } 

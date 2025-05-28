@@ -47,15 +47,15 @@ public class OlympiadService {
     }
     
     public List<Olympiad> findActiveOlympiads(LocalDateTime now) {
-        return olympiadRepository.findByStartDateBeforeAndEndDateAfter(now, now);
+        return olympiadRepository.findByStatus(com.olimpiada.entity.OlympiadStatus.ACTIVE);
     }
     
     public List<Olympiad> findUpcomingOlympiads(LocalDateTime now) {
-        return olympiadRepository.findByStartDateAfter(now);
+        return olympiadRepository.findByStatusAndStartDateAfter(com.olimpiada.entity.OlympiadStatus.PUBLISHED, now);
     }
     
     public List<Olympiad> findPastOlympiads(LocalDateTime now) {
-        return olympiadRepository.findByEndDateBefore(now);
+        return olympiadRepository.findByStatus(com.olimpiada.entity.OlympiadStatus.FINISHED);
     }
     
     public List<Olympiad> searchOlympiads(String search) {
@@ -64,5 +64,28 @@ public class OlympiadService {
     
     public List<Olympiad> findActiveOlympiads() {
         return olympiadRepository.findByStatus(com.olimpiada.entity.OlympiadStatus.ACTIVE);
+    }
+    
+    public void updateOlympiadStatuses() {
+        List<Olympiad> olympiads = olympiadRepository.findAll();
+        LocalDateTime now = LocalDateTime.now();
+        for (Olympiad olympiad : olympiads) {
+            switch (olympiad.getStatus()) {
+                case PUBLISHED:
+                    if (olympiad.getStartDate().isBefore(now) || olympiad.getStartDate().isEqual(now)) {
+                        olympiad.setStatus(com.olimpiada.entity.OlympiadStatus.ACTIVE);
+                        olympiadRepository.save(olympiad);
+                    }
+                    break;
+                case ACTIVE:
+                    if (olympiad.getEndDate().isBefore(now) || olympiad.getEndDate().isEqual(now)) {
+                        olympiad.setStatus(com.olimpiada.entity.OlympiadStatus.FINISHED);
+                        olympiadRepository.save(olympiad);
+                    }
+                    break;
+                default:
+                    // ничего не делаем для DRAFT, FINISHED, CANCELLED
+            }
+        }
     }
 } 

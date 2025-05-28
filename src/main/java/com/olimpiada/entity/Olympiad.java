@@ -41,6 +41,9 @@ public class Olympiad {
     @Column(nullable = false)
     private Integer courseNumber;
 
+    @Column(name = "image_path")
+    private String imagePath;
+
     @OneToMany(mappedBy = "olympiad", cascade = CascadeType.ALL)
     private List<Task> tasks;
 
@@ -147,5 +150,13 @@ public class Olympiad {
 
     public void setCourseNumber(Integer courseNumber) {
         this.courseNumber = courseNumber;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 } 

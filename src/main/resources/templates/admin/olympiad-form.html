@@ -24,10 +24,21 @@
         <h2 th:text="${olympiad.id == null ? 'Добавление олимпиады' : 'Редактирование олимпиады'}"></h2>
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
         <form th:action="${olympiad.id == null ? '/admin/olympiads/add' : '/admin/olympiads/edit/' + olympiad.id}"
-              method="post" class="mt-4">
+              method="post" class="mt-4" enctype="multipart/form-data">
             <div class="mb-3">
                 <label for="name" class="form-label">Название олимпиады</label>
-                <input type="text" class="form-control" id="name" name="name" th:value="${olympiad.name}" required>
+                <input type="text" class="form-control" id="name" name="name" th:value="${olympiad.name}" required data-bs-toggle="tooltip" data-bs-placement="right" title="Заполните это поле">
+            </div>
+            <div class="mb-3">
+                <label for="image" class="form-label">Фото олимпиады (опционально)</label>
+                <div id="imagePreviewContainer" style="display: flex; flex-direction: row; align-items: center; gap: 16px; margin-top: 10px;">
+                    <th:block th:if="${olympiad.imagePath != null}">
+                        <img th:src="@{'/olympiad_uploads/' + ${olympiad.imagePath}}" alt="Фото олимпиады" id="previewImg" style="width: 320px; max-width: 100%; height: auto; object-fit: contain; border: 2px solid #dee2e6; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                        <button type="button" class="btn btn-sm btn-danger" style="border-radius: 50%; width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;" onclick="removeOlympiadImage(this)">&times;</button>
+                        <input type="hidden" name="removeImage" id="removeImage" value="false">
+                    </th:block>
+                </div>
+                <input type="file" class="form-control mt-2" id="image" name="image" accept="image/*" onchange="showOlympiadImagePreview(this)">
             </div>
             <div class="mb-3">
                 <label for="description" class="form-label">Описание олимпиады</label>
@@ -35,17 +46,17 @@
             </div>
             <div class="mb-3">
                 <label for="age" class="form-label">Возраст участников</label>
-                <input type="number" class="form-control" id="age" name="age" th:value="${olympiad.age}" required>
+                <input type="number" class="form-control" id="age" name="age" th:value="${olympiad.age}" required min="17">
             </div>
             <div class="mb-3">
                 <label for="startDate" class="form-label">Дата начала</label>
                 <input type="datetime-local" class="form-control" id="startDate" name="startDate"
-                       th:value="${olympiad.startDate != null ? #temporals.format(olympiad.startDate, 'yyyy-MM-dd''T''HH:mm') : ''}" required>
+                       th:value="${olympiad.startDate != null ? #temporals.format(olympiad.startDate, 'yyyy-MM-dd''T''HH:mm') : ''}" required min=""/>
             </div>
             <div class="mb-3">
                 <label for="endDate" class="form-label">Дата окончания</label>
                 <input type="datetime-local" class="form-control" id="endDate" name="endDate"
-                       th:value="${olympiad.endDate != null ? #temporals.format(olympiad.endDate, 'yyyy-MM-dd''T''HH:mm') : ''}" required>
+                       th:value="${olympiad.endDate != null ? #temporals.format(olympiad.endDate, 'yyyy-MM-dd''T''HH:mm') : ''}" required min=""/>
             </div>
             <div class="mb-3">
                 <label for="educationLevel" class="form-label">Уровень образования</label>
@@ -73,6 +84,16 @@
         <p>&copy; 2025 Олимпиады Муромского Института ВлГУ. Все права защищены.</p>
     </div>
 </footer>
+<div aria-live="polite" aria-atomic="true" style="position: fixed; bottom: 1rem; right: 1rem; min-width: 300px; z-index: 9999;">
+    <div class="toast align-items-center bg-danger text-white border-0" id="dateValidationToast" role="alert" aria-live="assertive" aria-atomic="true" style="display:none;">
+        <div class="d-flex">
+            <div class="toast-body" id="dateValidationToastBody">
+                <!-- JS заполнит -->
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 function updateCourseNumberOptions() {
@@ -94,6 +115,101 @@ function updateCourseNumberOptions() {
 }
 document.getElementById('educationLevel').addEventListener('change', updateCourseNumberOptions);
 document.addEventListener('DOMContentLoaded', updateCourseNumberOptions);
+
+function showOlympiadImagePreview(input) {
+    const container = document.getElementById('imagePreviewContainer');
+    container.innerHTML = '';
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            container.style.display = 'flex';
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.alt = 'Превью';
+            img.id = 'previewImg';
+            img.style.width = '320px';
+            img.style.maxWidth = '100%';
+            img.style.height = 'auto';
+            img.style.objectFit = 'contain';
+            img.style.border = '2px solid #dee2e6';
+            img.style.borderRadius = '8px';
+            img.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn btn-sm btn-danger';
+            btn.style.borderRadius = '50%';
+            btn.style.width = '32px';
+            btn.style.height = '32px';
+            btn.style.padding = '0';
+            btn.style.display = 'flex';
+            btn.style.alignItems = 'center';
+            btn.style.justifyContent = 'center';
+            btn.style.fontSize = '1.5rem';
+            btn.innerHTML = '&times;';
+            btn.onclick = function() {
+                input.value = '';
+                container.innerHTML = '';
+            };
+            container.appendChild(img);
+            container.appendChild(btn);
+        };
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        container.innerHTML = '';
+    }
+}
+function removeOlympiadImage(btn) {
+    // Скрыть превью и очистить input file
+    const container = btn.closest('div');
+    container.innerHTML = '';
+    const fileInput = document.getElementById('image');
+    if (fileInput) fileInput.value = '';
+    document.getElementById('removeImage').value = 'true';
+}
+
+// Валидация: дата окончания не раньше даты начала (toast)
+const olympiadForm = document.querySelector('form');
+olympiadForm.addEventListener('submit', function(e) {
+    const start = document.getElementById('startDate').value;
+    const end = document.getElementById('endDate').value;
+    if (start && end && new Date(end) < new Date(start)) {
+        showDateValidationToast('Дата окончания не может быть раньше даты начала!');
+        e.preventDefault();
+    }
+});
+function showDateValidationToast(message) {
+    const toastDiv = document.getElementById('dateValidationToast');
+    const toastBody = document.getElementById('dateValidationToastBody');
+    toastBody.textContent = message;
+    toastDiv.classList.add('bg-danger', 'text-white');
+    toastDiv.style.display = '';
+    var toast = new bootstrap.Toast(toastDiv, { delay: 3000 });
+    toast.show();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Установить минимальную дату для startDate
+    var now = new Date();
+    var pad = n => n < 10 ? '0' + n : n;
+    var minDate = now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate()) + 'T' + pad(now.getHours()) + ':' + pad(now.getMinutes());
+    var startDateInput = document.getElementById('startDate');
+    var endDateInput = document.getElementById('endDate');
+    if (startDateInput) startDateInput.setAttribute('min', minDate);
+    // Установить min для endDate равным startDate
+    function updateEndDateMin() {
+        if (startDateInput && endDateInput) {
+            endDateInput.min = startDateInput.value || minDate;
+            // Если endDate меньше нового min, сбросить значение
+            if (endDateInput.value && endDateInput.value < endDateInput.min) {
+                endDateInput.value = endDateInput.min;
+            }
+        }
+    }
+    if (startDateInput && endDateInput) {
+        startDateInput.addEventListener('change', updateEndDateMin);
+        updateEndDateMin();
+    }
+});
 </script>
 </body>
 </html>

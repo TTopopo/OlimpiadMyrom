@@ -39,6 +39,9 @@ public class Task {
     @Transient
     private String displayCorrectAnswer;
 
+    @Column(name = "image_path")
+    private String imagePath;
+
     public Long getId() {
         return id;
     }
@@ -118,5 +121,13 @@ public class Task {
 
     public void setDisplayCorrectAnswer(String displayCorrectAnswer) {
         this.displayCorrectAnswer = displayCorrectAnswer;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 } 

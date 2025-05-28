@@ -51,6 +51,7 @@
             <thead>
                 <tr>
                     <th>Название</th>
+                    <th>Фото</th>
                     <th>Описание</th>
                     <th>Возраст</th>
                     <th>Курс</th>
@@ -63,6 +64,12 @@
             <tbody>
                 <tr th:each="olympiad : ${olympiads}">
                     <td th:text="${olympiad.name}"></td>
+                    <td>
+                        <span th:if="${olympiad.imagePath != null}">
+                            <img th:src="@{'/olympiad_uploads/' + ${olympiad.imagePath}}" alt="Фото" style="max-width: 60px; max-height: 40px; object-fit: cover;">
+                        </span>
+                        <a th:if="${olympiad.imagePath == null}" th:href="@{/admin/olympiads/edit/{id}(id=${olympiad.id})}" style="color: #007bff; text-decoration: underline; cursor: pointer;">+добавить фото</a>
+                    </td>
                     <td th:text="${olympiad.description}"></td>
                     <td th:text="${olympiad.age}"></td>
                     <td th:text="${olympiad.courseNumber}"></td>
@@ -71,10 +78,13 @@
                     <td th:text="${olympiad.endDate}"></td>
                     <td>
                         <a th:href="@{/admin/olympiads/edit/{id}(id=${olympiad.id})}" class="btn btn-warning">Редактировать</a>
-                        <form th:action="@{/admin/olympiads/delete/{id}(id=${olympiad.id})}" method="post" style="display:inline;">
-                            <button type="submit" class="btn btn-danger">Удалить</button>
-                        </form>
+                        <button type="button" class="btn btn-danger" th:attr="data-id=${olympiad.id}" onclick="showDeleteOlympiadModal(this.getAttribute('data-id'))">Удалить</button>
                         <a th:href="@{/admin/tasks/olympiad/{olympiadId}(olympiadId=${olympiad.id})}" class="btn btn-success">Список заданий</a>
+                        <form th:if="${olympiad.status.name() != 'FINISHED' and olympiad.endDate > T(java.time.LocalDateTime).now()}" th:action="@{/admin/olympiads/publish/{id}(id=${olympiad.id})}" method="post" style="display:inline-block;">
+                            <button type="submit" class="btn btn-primary"
+                                th:disabled="${olympiad.status.name() == 'PUBLISHED' or olympiad.status.name() == 'ACTIVE' or olympiad.status.name() == 'FINISHED'}"
+                                th:text="${olympiad.status.name() == 'PUBLISHED' or olympiad.status.name() == 'ACTIVE' ? 'Опубликована' : 'Опубликовать'}"></button>
+                        </form>
                     </td>
                 </tr>
             </tbody>
@@ -86,6 +96,33 @@
         <p>&copy; 2025 Олимпиады Муромского Института ВлГУ. Все права защищены.</p>
     </div>
 </footer>
+<div class="modal fade" id="deleteOlympiadModal" tabindex="-1" aria-labelledby="deleteOlympiadModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteOlympiadModalLabel">Подтвердите удаление</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Вы действительно хотите удалить эту олимпиаду? Это действие необратимо.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+        <form id="deleteOlympiadForm" method="post">
+          <button type="submit" class="btn btn-danger">Удалить</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function showDeleteOlympiadModal(id) {
+    const form = document.getElementById('deleteOlympiadForm');
+    form.action = '/admin/olympiads/delete/' + id;
+    var modal = new bootstrap.Modal(document.getElementById('deleteOlympiadModal'));
+    modal.show();
+}
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html> 

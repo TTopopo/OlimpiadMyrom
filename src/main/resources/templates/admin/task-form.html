@@ -41,8 +41,9 @@
         <form th:action="${task.id == null ? '/admin/tasks/add' : '/admin/tasks/edit/' + task.id}" 
               method="post" 
               th:object="${task}"
-              class="mt-4">
-            <a href="/admin/olympiads" class="btn btn-outline-secondary mb-3">
+              class="mt-4"
+              enctype="multipart/form-data">
+            <a th:href="@{/admin/tasks/olympiad/{olympiadId}(olympiadId=${task.olympiad.id})}" class="btn btn-outline-secondary mb-3">
                 <i class="bi bi-arrow-left"></i> Назад
             </a>
             
@@ -52,12 +53,23 @@
             
             <div class="mb-3">
                 <label for="title" class="form-label">Название задания</label>
-                <input type="text" class="form-control" id="title" th:field="*{title}" required>
+                <input type="text" class="form-control" id="title" th:field="*{title}" required data-bs-toggle="tooltip" data-bs-placement="right" title="Заполните это поле">
             </div>
-            
             <div class="mb-3">
-                <label for="taskText" class="form-label">Описание задания</label>
-                <textarea class="form-control" id="taskText" th:field="*{taskText}" rows="3" required></textarea>
+                <label for="image" class="form-label">Фото (опционально)</label>
+                <div id="imagePreviewContainer" style="display: flex; flex-direction: row; align-items: center; gap: 16px; margin-top: 10px;">
+                    <th:block th:if="${task.imagePath != null}">
+                        <img th:src="@{'/uploads/' + ${task.imagePath}}" alt="Фото задания" id="previewImg" style="width: 320px; max-width: 100%; height: auto; object-fit: contain; border: 2px solid #dee2e6; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                        <button type="button" class="btn btn-sm btn-danger" style="border-radius: 50%; width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;" onclick="removeTaskImage(this)">&times;</button>
+                        <input type="hidden" name="removeImage" id="removeImage" value="false">
+                    </th:block>
+                </div>
+                <input type="file" class="form-control mt-2" id="image" name="image" accept="image/*" onchange="showImagePreview(this)">
+            </div>
+            <div class="mb-3">
+                <label for="taskText" class="form-label">Текст задания</label>
+                <textarea class="form-control" id="taskText" th:field="*{taskText}" rows="3"></textarea>
+                <div class="form-text">Если вопрос содержится на изображении, вы можете оставить это поле пустым или написать: "Смотрите на фото".</div>
             </div>
             
             <div class="mb-3">
@@ -324,6 +336,16 @@
 
         function validateTaskForm(e) {
             hideValidationAlert();
+            // Новая валидация: фото или текст задания обязательно
+            const imageInput = document.getElementById('image');
+            const taskText = document.getElementById('taskText');
+            const hasImage = imageInput && imageInput.files && imageInput.files.length > 0;
+            const hasText = taskText && taskText.value.trim().length > 0;
+            if (!hasImage && !hasText) {
+                showValidationAlert('Заполните текст задания или добавьте фото!');
+                e.preventDefault();
+                return;
+            }
             const taskType = document.getElementById('taskType').value;
             // Берём только видимые поля
             const answerInputs = Array.from(document.querySelectorAll('.answer-fields:not([style*="none"]) input[name="answers"]'));
@@ -360,6 +382,80 @@
             // ... остальная валидация (если нужна) ...
         }
         document.querySelector('form').addEventListener('submit', validateTaskForm);
+
+        function showImagePreview(input) {
+            const container = document.getElementById('imagePreviewContainer');
+            container.innerHTML = '';
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    container.style.display = 'flex';
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.alt = 'Превью';
+                    img.id = 'previewImg';
+                    img.style.width = '320px';
+                    img.style.maxWidth = '100%';
+                    img.style.height = 'auto';
+                    img.style.objectFit = 'contain';
+                    img.style.border = '2px solid #dee2e6';
+                    img.style.borderRadius = '8px';
+                    img.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'btn btn-sm btn-danger';
+                    btn.style.borderRadius = '50%';
+                    btn.style.width = '32px';
+                    btn.style.height = '32px';
+                    btn.style.padding = '0';
+                    btn.style.display = 'flex';
+                    btn.style.alignItems = 'center';
+                    btn.style.justifyContent = 'center';
+                    btn.style.fontSize = '1.5rem';
+                    btn.innerHTML = '&times;';
+                    btn.onclick = function() {
+                        input.value = '';
+                        container.innerHTML = '';
+                    };
+                    container.appendChild(img);
+                    container.appendChild(btn);
+                };
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                container.innerHTML = '';
+            }
+        }
+        function removeTaskImage(btn) {
+            // Скрыть превью и очистить input file
+            const container = btn.closest('div');
+            container.innerHTML = '';
+            const fileInput = document.getElementById('image');
+            if (fileInput) fileInput.value = '';
+            document.getElementById('removeImage').value = 'true';
+        }
+
+        const taskForm = document.querySelector('form');
+        taskForm.addEventListener('submit', function(e) {
+            let valid = true;
+            const title = document.getElementById('title');
+            if (!title.value.trim()) {
+                valid = false;
+                showCustomTooltip(title, 'Заполните это поле');
+            }
+            // ... аналогично для других полей ...
+            if (!valid) {
+                e.preventDefault();
+            }
+        });
+        function showCustomTooltip(element, message) {
+            element.setAttribute('data-bs-original-title', message);
+            var tooltip = bootstrap.Tooltip.getInstance(element);
+            if (!tooltip) {
+                tooltip = new bootstrap.Tooltip(element);
+            }
+            tooltip.show();
+            setTimeout(() => { tooltip.hide(); }, 2500);
+        }
     </script>
 </body>
 </html> 

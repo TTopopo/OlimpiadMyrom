@@ -12,6 +12,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.multipart.MultipartFile;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import java.util.Arrays;
 import java.util.List;
@@ -52,10 +56,13 @@ public class AdminTaskController {
                          @RequestParam(required = false) List<Integer> correctAnswers,
                          @RequestParam(required = false) String correctTextAnswer,
                          @RequestParam(required = false) String correctCodeAnswer,
+                         @RequestParam(value = "image", required = false) MultipartFile image,
                          Model model,
                          RedirectAttributes redirectAttributes) {
         String error = validateTask(task, answers, correctAnswer, correctAnswers, correctTextAnswer, correctCodeAnswer);
         if (error != null) {
+            Olympiad olympiad = olympiadService.findById(olympiadId);
+            task.setOlympiad(olympiad);
             model.addAttribute("task", task);
             model.addAttribute("taskTypes", Arrays.asList(TaskType.values()));
             model.addAttribute("error", error);
@@ -66,7 +73,6 @@ public class AdminTaskController {
             task.setOlympiad(olympiad);
             // Сохраняем все варианты в options
             if (answers != null && !answers.isEmpty()) {
-                // Удаляем пустые варианты (distinct убран!)
                 List<String> filteredAnswers = answers.stream()
                     .map(String::trim)
                     .filter(s -> !s.isEmpty())
@@ -101,7 +107,18 @@ public class AdminTaskController {
                     task.setCorrectAnswer(correctCodeAnswer);
                     break;
             }
-
+            // --- Обработка фото ---
+            if (image != null && !image.isEmpty()) {
+                String uploadDir = "uploads";
+                String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
+                Path uploadPath = Paths.get(uploadDir);
+                if (!Files.exists(uploadPath)) {
+                    Files.createDirectories(uploadPath);
+                }
+                image.transferTo(uploadPath.resolve(fileName));
+                task.setImagePath(fileName);
+            }
+            // --- /Обработка фото ---
             taskService.saveTask(task);
             redirectAttributes.addFlashAttribute("success", "Задание успешно добавлено");
             return "redirect:/admin/olympiads/" + task.getOlympiad().getId();
@@ -146,10 +163,14 @@ public class AdminTaskController {
                            @RequestParam(required = false) List<Integer> correctAnswers,
                            @RequestParam(required = false) String correctTextAnswer,
                            @RequestParam(required = false) String correctCodeAnswer,
+                           @RequestParam(value = "image", required = false) MultipartFile image,
+                           @RequestParam(value = "removeImage", required = false) String removeImage,
                            Model model,
                            RedirectAttributes redirectAttributes) {
         String error = validateTask(task, answers, correctAnswer, correctAnswers, correctTextAnswer, correctCodeAnswer);
         if (error != null) {
+            Task existingTask = taskService.getTaskById(id);
+            task.setOlympiad(existingTask.getOlympiad());
             model.addAttribute("task", task);
             model.addAttribute("taskTypes", Arrays.asList(TaskType.values()));
             model.addAttribute("error", error);
@@ -163,7 +184,6 @@ public class AdminTaskController {
             existingTask.setTaskType(task.getTaskType());
             // Сохраняем все варианты в options
             if (answers != null && !answers.isEmpty()) {
-                // Удаляем пустые варианты (distinct убран!)
                 List<String> filteredAnswers = answers.stream()
                     .map(String::trim)
                     .filter(s -> !s.isEmpty())
@@ -198,7 +218,21 @@ public class AdminTaskController {
                     existingTask.setCorrectAnswer(correctCodeAnswer);
                     break;
             }
-
+            // --- Обработка фото ---
+            if (image != null && !image.isEmpty()) {
+                String uploadDir = "uploads";
+                String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
+                Path uploadPath = Paths.get(uploadDir);
+                if (!Files.exists(uploadPath)) {
+                    Files.createDirectories(uploadPath);
+                }
+                image.transferTo(uploadPath.resolve(fileName));
+                existingTask.setImagePath(fileName);
+            } else {
+                // Если не выбрано новое фото, оставить старое
+                existingTask.setImagePath(existingTask.getImagePath());
+            }
+            // --- /Обработка фото ---
             taskService.saveTask(existingTask);
             redirectAttributes.addFlashAttribute("success", "Задание успешно обновлено");
             return "redirect:/admin/olympiads/" + existingTask.getOlympiad().getId();
@@ -215,7 +249,7 @@ public class AdminTaskController {
             Long olympiadId = task.getOlympiad().getId();
             taskService.deleteTask(id);
             redirectAttributes.addFlashAttribute("success", "Задание успешно удалено");
-            return "redirect:/admin/olympiads/" + olympiadId;
+            return "redirect:/admin/tasks/olympiad/" + olympiadId;
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Ошибка при удалении задания: " + e.getMessage());
             return "redirect:/admin/olympiads/" + id;
@@ -272,7 +306,6 @@ public class AdminTaskController {
 
     private String validateTask(Task task, List<String> answers, Integer correctAnswer, List<Integer> correctAnswers, String correctTextAnswer, String correctCodeAnswer) {
         if (task.getTitle() == null || task.getTitle().trim().isEmpty()) return "Название задания обязательно";
-        if (task.getTaskText() == null || task.getTaskText().trim().isEmpty()) return "Описание задания обязательно";
         if (task.getMaxScore() == null || task.getMaxScore() <= 0) return "Максимальный балл должен быть больше 0";
         if (task.getTaskType() == null) return "Тип задания обязателен";
         switch (task.getTaskType()) {

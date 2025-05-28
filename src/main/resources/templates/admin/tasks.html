@@ -1,0 +1,31 @@
+<button type="button" class="btn btn-danger" th:attr="data-id=${task.id}" onclick="showDeleteTaskModal(this.getAttribute('data-id'))">Удалить</button>
+
+<!-- Модальное окно для подтверждения удаления задания -->
+<div class="modal fade" id="deleteTaskModal" tabindex="-1" aria-labelledby="deleteTaskModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteTaskModalLabel">Подтвердите удаление</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Вы действительно хотите удалить это задание? Это действие необратимо.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+        <form id="deleteTaskForm" method="post">
+          <button type="submit" class="btn btn-danger">Удалить</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function showDeleteTaskModal(id) {
+    const form = document.getElementById('deleteTaskForm');
+    form.action = '/admin/tasks/delete/' + id;
+    var modal = new bootstrap.Modal(document.getElementById('deleteTaskModal'));
+    modal.show();
+}
+</script>
+<div th:if="${success}" class="alert alert-success" th:text="${success}"></div> 

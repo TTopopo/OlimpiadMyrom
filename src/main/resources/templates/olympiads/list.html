@@ -75,15 +75,19 @@
                     </div>
                     <div th:each="olympiad : ${activeOlympiads}" class="card mb-3">
                         <div class="card-body">
+                            <div th:if="${olympiad.imagePath != null}">
+                                <img th:src="@{'/olympiad_uploads/' + ${olympiad.imagePath}}" alt="Фото олимпиады" style="max-width: 120px; max-height: 80px; object-fit: cover; margin-bottom: 10px;">
+                            </div>
                             <h4 class="card-title" th:text="${olympiad.name}">Название олимпиады</h4>
                             <p class="card-text">
                                 <strong>Сроки проведения:</strong><br>
                                 Начало: <span th:text="${#temporals.format(olympiad.startDate, 'dd.MM.yyyy HH:mm')}"></span><br>
                                 Окончание: <span th:text="${#temporals.format(olympiad.endDate, 'dd.MM.yyyy HH:mm')}"></span>
                             </p>
-                            <form th:action="@{/api/participations/olympiad/{id}(id=${olympiad.id})}" method="post" style="display:inline;">
+                            <form th:if="${#authorization.expression('isAuthenticated()')}" th:action="@{/api/participations/olympiad/{id}(id=${olympiad.id})}" method="post" style="display:inline;">
                                 <button type="submit" class="btn btn-primary">Участвовать</button>
                             </form>
+                            <a th:if="${!#authorization.expression('isAuthenticated()')}" th:href="@{/login}" class="btn btn-outline-primary">Войти для участия</a>
                         </div>
                     </div>
                 </div>
@@ -100,6 +104,9 @@
                     </div>
                     <div th:each="olympiad : ${upcomingOlympiads}" class="card mb-3">
                         <div class="card-body">
+                            <div th:if="${olympiad.imagePath != null}">
+                                <img th:src="@{'/olympiad_uploads/' + ${olympiad.imagePath}}" alt="Фото олимпиады" style="max-width: 120px; max-height: 80px; object-fit: cover; margin-bottom: 10px;">
+                            </div>
                             <h4 class="card-title" th:text="${olympiad.name}">Название олимпиады</h4>
                             <p class="card-text">
                                 <strong>Сроки проведения:</strong><br>
@@ -124,6 +131,9 @@
                     </div>
                     <div th:each="olympiad : ${pastOlympiads}" class="card mb-3">
                         <div class="card-body">
+                            <div th:if="${olympiad.imagePath != null}">
+                                <img th:src="@{'/olympiad_uploads/' + ${olympiad.imagePath}}" alt="Фото олимпиады" style="max-width: 120px; max-height: 80px; object-fit: cover; margin-bottom: 10px;">
+                            </div>
                             <h4 class="card-title" th:text="${olympiad.name}">Название олимпиады</h4>
                             <p class="card-text">
                                 <strong>Сроки проведения:</strong><br>

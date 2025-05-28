@@ -36,6 +36,9 @@ public class Task {
     @JoinColumn(name = "olympiad_id", nullable = false)
     private Olympiad olympiad;
 
+    @Transient
+    private String displayCorrectAnswer;
+
     public Long getId() {
         return id;
     }
@@ -107,5 +110,13 @@ public class Task {
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
                 .toList();
+    }
+
+    public String getDisplayCorrectAnswer() {
+        return displayCorrectAnswer;
+    }
+
+    public void setDisplayCorrectAnswer(String displayCorrectAnswer) {
+        this.displayCorrectAnswer = displayCorrectAnswer;
     }
 } 

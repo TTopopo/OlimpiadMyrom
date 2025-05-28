@@ -47,6 +47,8 @@
             </a>
             
             <input type="hidden" name="olympiadId" th:value="${task.olympiad.id}">
+            <input type="hidden" id="optionsList" th:value="${options != null ? #strings.arrayJoin(options, '||') : ''}">
+            <input type="hidden" id="correctAnswersList" th:value="${correctAnswers != null ? #strings.arrayJoin(correctAnswers, '||') : ''}">
             
             <div class="mb-3">
                 <label for="title" class="form-label">Название задания</label>
@@ -73,37 +75,12 @@
                 </select>
             </div>
 
-            <!-- Поля для ответов -->
-            <div id="singleChoiceFields" class="answer-fields mb-3" style="display: none;">
-                <h4>Варианты ответов (один правильный)</h4>
-                <div th:if="${options != null and !options.isEmpty()}" th:each="option, iterStat : ${options}" class="mb-2 answer-option">
-                    <div class="input-group mb-2">
-                        <input type="text" class="form-control" name="answers" placeholder="Вариант ответа" th:value="${option}">
-                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="clearInputField(this)" title="Очистить"><i class="bi bi-eraser"></i></button>
-                        <button type="button" class="btn btn-danger btn-sm" onclick="removeAnswerField(this)" title="Удалить вариант"><i class="bi bi-x"></i></button>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="correctAnswer" th:value="${iterStat.index}" th:checked="${#lists.contains(correctAnswers, option)}">
-                        <label class="form-check-label">Правильный ответ</label>
-                    </div>
-                </div>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="addAnswerField('singleChoiceFields')">Добавить вариант</button>
+            <!-- Варианты ответа для SINGLE_CHOICE и MULTIPLE_CHOICE -->
+            <div id="singleChoiceFields" class="answer-fields">
+                <!-- answer options будут добавляться динамически -->
             </div>
-
-            <div id="multipleChoiceFields" class="answer-fields mb-3" style="display: none;">
-                <h4>Варианты ответов (несколько правильных)</h4>
-                <div th:if="${options != null and !options.isEmpty()}" th:each="option, iterStat : ${options}" class="mb-2 answer-option">
-                    <div class="input-group mb-2">
-                        <input type="text" class="form-control" name="answers" placeholder="Вариант ответа" th:value="${option}">
-                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="clearInputField(this)" title="Очистить"><i class="bi bi-eraser"></i></button>
-                        <button type="button" class="btn btn-danger btn-sm" onclick="removeAnswerField(this)" title="Удалить вариант"><i class="bi bi-x"></i></button>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="correctAnswers" th:value="${iterStat.index}" th:checked="${#lists.contains(correctAnswers, option)}">
-                        <label class="form-check-label">Правильный ответ</label>
-                    </div>
-                </div>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="addAnswerField('multipleChoiceFields')">Добавить вариант</button>
+            <div id="multipleChoiceFields" class="answer-fields">
+                <!-- answer options будут добавляться динамически -->
             </div>
 
             <div id="textAnswerFields" class="answer-fields mb-3" style="display: none;">
@@ -138,18 +115,21 @@
             if (taskType === 'SINGLE_CHOICE') {
                 const container = document.getElementById('singleChoiceFields');
                 container.style.display = 'block';
-                // Если вариантов меньше 2, сбросить и сгенерировать 2 поля
+                // Если уже есть 2 или больше вариантов, не сбрасываем и не добавляем
                 if (container.querySelectorAll('.answer-option').length < 2) {
-                    container.querySelectorAll('.answer-option').forEach(e => e.remove());
+                    resetAnswerFields();
                     generateAnswerFields('singleChoiceFields', 2);
                 }
+                updateRemoveButtons('singleChoiceFields');
             } else if (taskType === 'MULTIPLE_CHOICE') {
                 const container = document.getElementById('multipleChoiceFields');
                 container.style.display = 'block';
+                // Если уже есть 3 или больше вариантов, не сбрасываем и не добавляем
                 if (container.querySelectorAll('.answer-option').length < 3) {
-                    container.querySelectorAll('.answer-option').forEach(e => e.remove());
+                    resetAnswerFields();
                     generateAnswerFields('multipleChoiceFields', 3);
                 }
+                updateRemoveButtons('multipleChoiceFields');
             } else if (taskType === 'TEXT_ANSWER') {
                 document.getElementById('textAnswerFields').style.display = 'block';
             } else if (taskType === 'CODE_ANSWER') {
@@ -169,6 +149,20 @@
             }
         }
 
+        function renderAddButton(containerId) {
+            const container = document.getElementById(containerId);
+            // Удаляем старую кнопку, если есть
+            const oldBtn = container.querySelector('.add-answer-btn');
+            if (oldBtn) oldBtn.remove();
+            // Создаём новую кнопку
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn btn-outline-primary btn-sm mt-2 mb-4 w-auto add-answer-btn';
+            btn.innerHTML = '<i class="bi bi-plus"></i> Добавить вариант';
+            btn.onclick = function() { addAnswerField(containerId); };
+            container.appendChild(btn);
+        }
+
         function generateAnswerFields(containerId, count) {
             const container = document.getElementById(containerId);
             for (let i = 0; i < count; i++) {
@@ -182,14 +176,15 @@
                     </div>
                     <div class="form-check">
                         <input class="form-check-input" type="${containerId === 'singleChoiceFields' ? 'radio' : 'checkbox'}" 
-                               name="${containerId === 'singleChoiceFields' ? 'correctAnswer' : 'correctAnswers'}" 
-                               value="${i}">
+                               name="${containerId === 'singleChoiceFields' ? 'correctAnswer' : 'correctAnswers'}">
                         <label class="form-check-label">Правильный ответ</label>
                     </div>
                 `;
-                container.insertBefore(newAnswerDiv, container.lastElementChild);
+                container.appendChild(newAnswerDiv);
             }
             updateRemoveButtons(containerId);
+            renumberAnswerIndexes(containerId);
+            renderAddButton(containerId);
         }
 
         function addAnswerField(containerId) {
@@ -205,19 +200,22 @@
                 </div>
                 <div class="form-check">
                     <input class="form-check-input" type="${containerId === 'singleChoiceFields' ? 'radio' : 'checkbox'}" 
-                           name="${containerId === 'singleChoiceFields' ? 'correctAnswer' : 'correctAnswers'}" 
-                           value="${answerCount}">
+                           name="${containerId === 'singleChoiceFields' ? 'correctAnswer' : 'correctAnswers'}">
                     <label class="form-check-label">Правильный ответ</label>
                 </div>
             `;
-            container.insertBefore(newAnswerDiv, container.lastElementChild);
+            container.appendChild(newAnswerDiv);
             updateRemoveButtons(containerId);
+            renumberAnswerIndexes(containerId);
+            renderAddButton(containerId);
         }
 
         function removeAnswerField(btn) {
             const container = btn.closest('.answer-fields');
             btn.closest('.answer-option').remove();
             updateRemoveButtons(container.id);
+            renumberAnswerIndexes(container.id);
+            renderAddButton(container.id);
         }
 
         function updateRemoveButtons(containerId) {
@@ -239,8 +237,76 @@
             if (input) input.value = '';
         }
 
+        function renumberAnswerIndexes(containerId) {
+            const container = document.getElementById(containerId);
+            const options = container.querySelectorAll('.answer-option');
+            options.forEach((option, idx) => {
+                const inputRadio = option.querySelector('input[type="radio"], input[type="checkbox"]');
+                if (inputRadio) {
+                    inputRadio.value = idx;
+                    // Явно выставляем name, чтобы не было дублирующихся
+                    if (containerId === 'singleChoiceFields') {
+                        inputRadio.name = 'correctAnswer';
+                    } else {
+                        inputRadio.name = 'correctAnswers';
+                    }
+                }
+            });
+        }
+
         // Показать соответствующие поля при загрузке страницы
-        document.addEventListener('DOMContentLoaded', showAnswerFields);
+        document.addEventListener('DOMContentLoaded', function() {
+            showAnswerFields();
+            var isAdd = !document.querySelector('form').action.includes('/edit/');
+            const taskType = document.getElementById('taskType').value;
+
+            // --- ДОБАВЛЕНО: подстановка вариантов при редактировании ---
+            if (!isAdd && (taskType === 'SINGLE_CHOICE' || taskType === 'MULTIPLE_CHOICE')) {
+                const optionsRaw = document.getElementById('optionsList').value;
+                const correctRaw = document.getElementById('correctAnswersList').value;
+                if (optionsRaw) {
+                    const options = optionsRaw.split('||');
+                    const corrects = correctRaw ? correctRaw.split('||') : [];
+                    const containerId = taskType === 'SINGLE_CHOICE' ? 'singleChoiceFields' : 'multipleChoiceFields';
+                    resetAnswerFields();
+                    options.forEach((opt, idx) => {
+                        const container = document.getElementById(containerId);
+                        const newAnswerDiv = document.createElement('div');
+                        newAnswerDiv.className = 'mb-2 answer-option';
+                        let checked = '';
+                        if (taskType === 'SINGLE_CHOICE' && corrects.length > 0 && corrects[0] == idx) checked = 'checked';
+                        if (taskType === 'MULTIPLE_CHOICE' && corrects.includes(idx.toString())) checked = 'checked';
+                        newAnswerDiv.innerHTML = `
+                            <div class="input-group mb-2">
+                                <input type="text" class="form-control" name="answers" placeholder="Вариант ответа" value="${opt}">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="clearInputField(this)" title="Очистить"><i class="bi bi-eraser"></i></button>
+                                <button type="button" class="btn btn-danger btn-sm" onclick="removeAnswerField(this)" title="Удалить вариант"><i class="bi bi-x"></i></button>
+                            </div>
+                            <div class="form-check ms-2">
+                                <input class="form-check-input" type="${taskType === 'SINGLE_CHOICE' ? 'radio' : 'checkbox'}" name="${taskType === 'SINGLE_CHOICE' ? 'correctAnswer' : 'correctAnswers'}" value="${idx}" ${checked}>
+                                <label class="form-check-label">Правильный ответ</label>
+                            </div>
+                        `;
+                        container.appendChild(newAnswerDiv);
+                    });
+                    updateRemoveButtons(containerId);
+                    renumberAnswerIndexes(containerId);
+                    renderAddButton(containerId);
+                }
+            }
+            // --- /ДОБАВЛЕНО ---
+
+            if (isAdd) {
+                if (taskType === 'SINGLE_CHOICE' && document.querySelectorAll('#singleChoiceFields .answer-option').length === 0) {
+                    generateAnswerFields('singleChoiceFields', 2);
+                }
+                if (taskType === 'MULTIPLE_CHOICE' && document.querySelectorAll('#multipleChoiceFields .answer-option').length === 0) {
+                    generateAnswerFields('multipleChoiceFields', 3);
+                }
+            }
+            if (taskType === 'SINGLE_CHOICE') renderAddButton('singleChoiceFields');
+            if (taskType === 'MULTIPLE_CHOICE') renderAddButton('multipleChoiceFields');
+        });
 
         // Заменяем showValidationAlert на toast
         function showValidationAlert(message) {

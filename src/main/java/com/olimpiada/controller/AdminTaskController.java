@@ -35,9 +35,12 @@ public class AdminTaskController {
         Task task = new Task();
         Olympiad olympiad = olympiadService.findById(olympiadId);
         task.setOlympiad(olympiad);
+        task.setTaskType(TaskType.SINGLE_CHOICE);
         
         model.addAttribute("task", task);
         model.addAttribute("taskTypes", Arrays.asList(TaskType.values()));
+        model.addAttribute("options", java.util.List.of("", "")); // минимум два пустых варианта
+        model.addAttribute("correctAnswers", java.util.List.of()); // пустой список правильных ответов
         return "admin/task-form";
     }
 
@@ -63,11 +66,10 @@ public class AdminTaskController {
             task.setOlympiad(olympiad);
             // Сохраняем все варианты в options
             if (answers != null && !answers.isEmpty()) {
-                // Удаляем пустые и дублирующиеся варианты
+                // Удаляем пустые варианты (distinct убран!)
                 List<String> filteredAnswers = answers.stream()
                     .map(String::trim)
                     .filter(s -> !s.isEmpty())
-                    .distinct()
                     .toList();
                 task.setOptions(String.join(";", filteredAnswers));
             }
@@ -75,7 +77,7 @@ public class AdminTaskController {
             switch (task.getTaskType()) {
                 case SINGLE_CHOICE:
                     if (correctAnswer != null && answers != null && correctAnswer < answers.size()) {
-                        task.setCorrectAnswer(answers.get(correctAnswer));
+                        task.setCorrectAnswer(String.valueOf(correctAnswer));
                     }
                     break;
                 case MULTIPLE_CHOICE:
@@ -86,7 +88,7 @@ public class AdminTaskController {
                                 if (correctAnswersStr.length() > 0) {
                                     correctAnswersStr.append(";");
                                 }
-                                correctAnswersStr.append(answers.get(index));
+                                correctAnswersStr.append(index);
                             }
                         }
                         task.setCorrectAnswer(correctAnswersStr.toString());
@@ -121,11 +123,7 @@ public class AdminTaskController {
                 options = java.util.Arrays.asList(task.getOptions().split(";"));
             }
             if (task.getCorrectAnswer() != null && !task.getCorrectAnswer().isEmpty()) {
-                if (task.getTaskType() == TaskType.SINGLE_CHOICE) {
-                    correctAnswers = java.util.List.of(task.getCorrectAnswer());
-                } else {
-                    correctAnswers = java.util.Arrays.asList(task.getCorrectAnswer().split(";"));
-                }
+                correctAnswers = java.util.Arrays.asList(task.getCorrectAnswer().split(";"));
             }
         }
         model.addAttribute("options", options);
@@ -165,11 +163,10 @@ public class AdminTaskController {
             existingTask.setTaskType(task.getTaskType());
             // Сохраняем все варианты в options
             if (answers != null && !answers.isEmpty()) {
-                // Удаляем пустые и дублирующиеся варианты
+                // Удаляем пустые варианты (distinct убран!)
                 List<String> filteredAnswers = answers.stream()
                     .map(String::trim)
                     .filter(s -> !s.isEmpty())
-                    .distinct()
                     .toList();
                 existingTask.setOptions(String.join(";", filteredAnswers));
             }
@@ -177,7 +174,7 @@ public class AdminTaskController {
             switch (task.getTaskType()) {
                 case SINGLE_CHOICE:
                     if (correctAnswer != null && answers != null && correctAnswer < answers.size()) {
-                        existingTask.setCorrectAnswer(answers.get(correctAnswer));
+                        existingTask.setCorrectAnswer(String.valueOf(correctAnswer));
                     }
                     break;
                 case MULTIPLE_CHOICE:
@@ -188,7 +185,7 @@ public class AdminTaskController {
                                 if (correctAnswersStr.length() > 0) {
                                     correctAnswersStr.append(";");
                                 }
-                                correctAnswersStr.append(answers.get(index));
+                                correctAnswersStr.append(index);
                             }
                         }
                         existingTask.setCorrectAnswer(correctAnswersStr.toString());
@@ -233,6 +230,38 @@ public class AdminTaskController {
             model.addAttribute("search", search);
         } else {
             tasks = taskService.getTasksByOlympiadId(olympiadId);
+        }
+        // Вычисляем displayCorrectAnswer для каждого задания
+        for (Task task : tasks) {
+            if ((task.getTaskType() == TaskType.SINGLE_CHOICE || task.getTaskType() == TaskType.MULTIPLE_CHOICE) && task.getOptions() != null) {
+                String[] opts = task.getOptions().split(";");
+                if (task.getTaskType() == TaskType.SINGLE_CHOICE) {
+                    try {
+                        int idx = Integer.parseInt(task.getCorrectAnswer());
+                        if (idx >= 0 && idx < opts.length) {
+                            task.setDisplayCorrectAnswer(opts[idx]);
+                        } else {
+                            task.setDisplayCorrectAnswer(task.getCorrectAnswer());
+                        }
+                    } catch (Exception e) {
+                        task.setDisplayCorrectAnswer(task.getCorrectAnswer());
+                    }
+                } else { // MULTIPLE_CHOICE
+                    String[] idxs = task.getCorrectAnswer() != null ? task.getCorrectAnswer().split(";") : new String[0];
+                    List<String> correctOpts = new java.util.ArrayList<>();
+                    for (String idxStr : idxs) {
+                        try {
+                            int idx = Integer.parseInt(idxStr);
+                            if (idx >= 0 && idx < opts.length) {
+                                correctOpts.add(opts[idx]);
+                            }
+                        } catch (Exception ignored) {}
+                    }
+                    task.setDisplayCorrectAnswer(String.join(", ", correctOpts));
+                }
+            } else {
+                task.setDisplayCorrectAnswer(task.getCorrectAnswer());
+            }
         }
         Olympiad olympiad = olympiadService.findById(olympiadId);
         model.addAttribute("tasks", tasks);

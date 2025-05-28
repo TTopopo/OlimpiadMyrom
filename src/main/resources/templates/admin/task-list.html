@@ -45,7 +45,7 @@
                         <td th:text="${task.taskText}" style="max-width: 300px; white-space: pre-line; overflow: hidden; text-overflow: ellipsis;"></td>
                         <td th:text="${task.taskType.displayName}"></td>
                         <td th:text="${task.maxScore}"></td>
-                        <td th:text="${task.correctAnswer}"></td>
+                        <td th:text="${task.displayCorrectAnswer}"></td>
                         <td>
                             <a th:href="@{/admin/tasks/edit/{id}(id=${task.id})}" class="btn btn-warning btn-sm">Редактировать</a>
                             <form th:action="@{/admin/tasks/delete/{id}(id=${task.id})}" method="post" style="display:inline-block;" onsubmit="return confirm('Вы уверены, что хотите удалить это задание?');">

@@ -23,6 +23,9 @@ public class UserAnswer {
     @Column(nullable = false)
     private LocalDateTime submissionTime;
     
+    @Column(nullable = false)
+    private boolean flagged = false;
+    
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -69,5 +72,13 @@ public class UserAnswer {
 
     public LocalDateTime getSubmissionTime() {
         return submissionTime;
+    }
+
+    public boolean isFlagged() {
+        return flagged;
+    }
+
+    public void setFlagged(boolean flagged) {
+        this.flagged = flagged;
     }
 } 

@@ -6,10 +6,130 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
-        html, body { height: 100%; }
+        html, body { height: 100%; overflow: auto; }
         body { min-height: 100vh; display: flex; flex-direction: column; }
         .main-content { flex: 1 0 auto; }
-        footer { flex-shrink: 0; background: #212529; color: #fff; border-top: 1px solid #343a40; text-align: center; padding: 12px 0 10px 0; font-size: 1rem; width: 100%; position: static; margin-top: 0; }
+        .container { margin-top: 1.2rem !important; margin-bottom: 1.2rem !important; height: auto; overflow: visible; }
+        .olympiad-section { padding: 1.2rem 0.7rem 1rem 0.7rem; }
+        .olympiad-section.active, .olympiad-section.upcoming, .olympiad-section.finished { margin-bottom: 0.7rem; }
+        .mt-4, .mb-4 { margin-top: 0 !important; margin-bottom: 0 !important; }
+        /* Кнопка "Связаться с администратором" всегда поверх футера */
+        #helpBtn { z-index: 1050 !important; bottom: 24px !important; right: 32px !important; }
+        .olympiad-card {
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            border: none;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            transition: box-shadow 0.2s, background 0.2s;
+            position: relative;
+            min-height: 340px;
+            max-height: 420px;
+        }
+        .olympiad-card.active { background: linear-gradient(135deg, #eaffea 0%, #d4f5e9 100%); }
+        .olympiad-card.upcoming { background: linear-gradient(135deg, #eaf3ff 0%, #d4e6f5 100%); }
+        .olympiad-card.finished { background: #f4f4f4; }
+        .olympiad-img-large {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            max-height: 120px;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .olympiad-badge {
+            position: absolute;
+            top: 18px;
+            left: 18px;
+            z-index: 2;
+            font-size: 1.1rem;
+            padding: 0.5em 1.2em;
+            border-radius: 1em;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .olympiad-status-active { background: #28a745; color: #fff; }
+        .olympiad-status-upcoming { background: #007bff; color: #fff; }
+        .olympiad-status-finished { background: #6c757d; color: #fff; }
+        .olympiad-card .card-body { flex: 1 1 auto; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 0.5rem; }
+        .olympiad-card .btn { margin-top: 0.5rem; }
+        @media (max-width: 991px) {
+            .olympiad-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 767px) {
+            .olympiad-grid { grid-template-columns: 1fr; }
+        }
+        .olympiad-section {
+            border-radius: 24px;
+            padding: 2.5rem 2rem 2rem 2rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+        }
+        .olympiad-section.active { background: linear-gradient(135deg, #eaffea 0%, #f6fff6 100%); }
+        .olympiad-section.upcoming { background: linear-gradient(135deg, #eaf3ff 0%, #f6faff 100%); }
+        .olympiad-section.finished { background: #f7f7f7; }
+        .btn-participate {
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(37,99,235,0.08);
+            transition: background 0.15s;
+        }
+        .btn-participate:hover, .btn-participate:focus {
+            background: #1746a2;
+            color: #fff;
+        }
+        .olympiad-meta {
+            font-size: 1rem;
+            color: #4b5563;
+            margin-bottom: 0.5rem;
+        }
+        /* Navbar одинаковая высота как на главной */
+        .navbar { min-height: 70px !important; padding-top: 0 !important; padding-bottom: 0 !important; }
+        .navbar .container { padding-left: 0; padding-right: 0; }
+        /* Кнопки "Вверх" и "Помощь" не перекрывают друг друга */
+        #scrollTopBtn { z-index: 1050 !important; bottom: 90px !important; right: 32px !important; }
+        footer.bg-dark {
+            padding: 0 !important;
+            font-size: 1.1rem;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .olympiad-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-auto-rows: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .card-text.olympiad-desc {
+            max-height: 3em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            white-space: normal;
+        }
+        .btn-blue {
+            background: #2563eb;
+            color: #fff !important;
+            border: none;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(37,99,235,0.08);
+            transition: background 0.15s;
+        }
+        .btn-blue:hover, .btn-blue:focus {
+            background: #1746a2;
+            color: #fff !important;
+        }
     </style>
 </head>
 <body>
@@ -25,129 +145,197 @@
                         <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
                             <a class="nav-link" th:href="@{/user/profile}">
                                 <i class="bi bi-person-circle"></i>
-                                <span th:text="${#authorization.expression('hasRole(''ADMIN'')') ? 'Администратор' : (#authentication.principal.fullName != null ? #authentication.principal.fullName : #authentication.name)}"></span>
+                                <span th:text="${#authorization.expression('hasRole(''ROLE_ADMIN'')') ? 'Администратор' : #authentication.name}"></span>
                             </a>
                         </li>
                         <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
                             <a class="nav-link" th:href="@{/logout}">Выйти</a>
                         </li>
                         <li class="nav-item" th:unless="${#authorization.expression('isAuthenticated()')}">
-                            <a class="nav-link" th:href="@{/login}">Войти</a>
+                            <a class="nav-link" th:href="@{/login(redirect='/olympiads')}">Войти</a>
                         </li>
                         <li class="nav-item" th:unless="${#authorization.expression('isAuthenticated()')}">
-                            <a class="nav-link" th:href="@{/register}">Регистрация</a>
+                            <a class="nav-link" th:href="@{/register(redirect='/olympiads')}">Регистрация</a>
                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
 
-        <div class="container mt-4">
-            <h2 class="mb-4">Доступные олимпиады</h2>
-
-            <div aria-live="polite" aria-atomic="true" style="position: fixed; top: 1rem; right: 1rem; min-width: 300px; z-index: 9999;">
-                <div class="toast align-items-center text-bg-success border-0" id="registerToast" role="alert" aria-live="assertive" aria-atomic="true" style="display:none;">
-                    <div class="d-flex">
-                        <div class="toast-body" id="registerToastBody">
-                            <!-- JS заполнит -->
-                        </div>
-                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                    </div>
-                </div>
-                <div class="toast align-items-center text-bg-warning border-0" id="alreadyRegisteredToast" role="alert" aria-live="assertive" aria-atomic="true" style="display:none;">
+        <div class="container mt-4" style="margin-top: 18px !important; margin-bottom: 18px !important;">
+            <!-- Toast уведомления -->
+            <div aria-live="polite" aria-atomic="true" style="position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%); min-width: 520px; max-width: 900px; width: 100vw; z-index: 9999; font-size: 1.1rem; font-weight: 500; display: flex; justify-content: center;">
+                <div class="toast align-items-center text-bg-success border-0" id="registerToast" role="alert" aria-live="assertive" aria-atomic="true" th:if="${success == 'registered'}" style="box-shadow:0 2px 16px rgba(16,185,129,0.18); min-height: 44px; font-size: 1.1em; font-weight: 600; white-space:nowrap; border-radius:0; width:100%;">
                     <div class="d-flex">
                         <div class="toast-body">
-                            <span>Вы уже записаны на эту олимпиаду!</span>
+                            <i class="bi bi-check-circle me-2"></i><b>Успех!</b> Вы записались на олимпиаду.
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="toast align-items-center text-bg-warning border-0" id="alreadyRegisteredToast" role="alert" aria-live="assertive" aria-atomic="true" th:if="${error == 'already_registered'}" style="box-shadow:0 2px 16px rgba(251,191,36,0.18); min-height: 44px; font-size: 1.1em; font-weight: 600; white-space:nowrap; border-radius:0; width:100%;">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="bi bi-exclamation-triangle me-2"></i><b>Внимание!</b> Уже записаны на эту олимпиаду.
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="toast align-items-center text-bg-danger border-0" id="notAllowedToast" role="alert" aria-live="assertive" aria-atomic="true" th:if="${error == 'not_allowed'}" style="box-shadow:0 2px 16px rgba(220,53,69,0.18); min-height: 44px; font-size: 1.1em; font-weight: 600; white-space:nowrap; border-radius:0; width:100%;">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="bi bi-x-octagon me-2"></i><span style="font-weight:700; color:#fff;">Выберите подходящую олимпиаду!</span> <b>Ошибка!</b> Ваш уровень или курс не подходит.
                         </div>
                         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                     </div>
                 </div>
             </div>
 
-            <!-- Активные олимпиады -->
-            <div class="card mb-4">
-                <div class="card-header bg-success text-white">
-                    <h3 class="h5 mb-0">Активные олимпиады</h3>
-                </div>
-                <div class="card-body">
-                    <div th:if="${activeOlympiads.empty}" class="alert alert-info">
-                        В данный момент нет активных олимпиад
+            <h2 class="mb-4" style="margin-top: 18px; margin-bottom: 18px;">Доступные олимпиады</h2>
+
+            <div class="olympiad-section active">
+                <h4 class="mb-3">Активные олимпиады</h4>
+                <div class="row mb-3">
+                    <div class="col-md-4 mb-2">
+                        <select class="form-select" id="active-education-filter">
+                            <option value="">Все уровни образования</option>
+                            <option value="BACHELOR">Бакалавриат</option>
+                            <option value="MASTER">Магистратура</option>
+                            <option value="SPO">СПО</option>
+                        </select>
                     </div>
-                    <div th:each="olympiad : ${activeOlympiads}" class="card mb-3">
-                        <div class="card-body">
-                            <div th:if="${olympiad.imagePath != null}">
-                                <img th:src="@{'/olympiad_uploads/' + ${olympiad.imagePath}}" alt="Фото олимпиады" style="max-width: 120px; max-height: 80px; object-fit: cover; margin-bottom: 10px;">
+                    <div class="col-md-4 mb-2">
+                        <select class="form-select" id="active-course-filter">
+                            <option value="">Все курсы</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                </div>
+                <div th:if="${activeOlympiads.empty}" class="alert alert-info">В данный момент нет активных олимпиад</div>
+                <div th:unless="${activeOlympiads.empty}">
+                    <div class="olympiad-grid" id="active-olympiad-grid">
+                        <div th:each="olympiad,iterStat : ${activeOlympiads}" class="card olympiad-card active h-100 position-relative"
+                             th:attr="data-education=${olympiad.educationLevel != null ? olympiad.educationLevel.name : ''},data-course=${olympiad.courseNumber}">
+                            <span class="olympiad-badge olympiad-status-active">Активно</span>
+                            <img th:if="${olympiad.imagePath != null}" th:src="@{'/olympiad_uploads/' + ${olympiad.imagePath}}" class="olympiad-img-large" alt="Фото олимпиады">
+                            <div class="card-body text-center">
+                                <h5 class="card-title mb-2" th:text="${olympiad.name}">Название олимпиады</h5>
+                                <div class="olympiad-meta" th:text="'Курс: ' + ${olympiad.courseNumber} + ', ' + (${olympiad.educationLevel != null ? olympiad.educationLevel.displayName : ''})"></div>
+                                <div class="text-muted mb-2" th:text="'Сроки: ' + ${#temporals.format(olympiad.startDate, 'dd.MM.yyyy')} + ' — ' + ${#temporals.format(olympiad.endDate, 'dd.MM.yyyy')}"></div>
+                                <p class="card-text olympiad-desc" th:text="${olympiad.description}">Описание олимпиады</p>
+                                <a th:if="${#authorization.expression('isAuthenticated()')}" th:href="@{/user/olympiad/{id}/start(id=${olympiad.id})}" class="btn btn-participate w-100">Участвовать</a>
+                                <a th:if="${!#authorization.expression('isAuthenticated()')}" th:href="@{/login(redirect='/api/participations/olympiad/' + ${olympiad.id} + '/confirm')}" class="btn btn-participate w-100">Войти для участия</a>
                             </div>
-                            <h4 class="card-title" th:text="${olympiad.name}">Название олимпиады</h4>
-                            <p class="card-text">
-                                <strong>Сроки проведения:</strong><br>
-                                Начало: <span th:text="${#temporals.format(olympiad.startDate, 'dd.MM.yyyy HH:mm')}"></span><br>
-                                Окончание: <span th:text="${#temporals.format(olympiad.endDate, 'dd.MM.yyyy HH:mm')}"></span>
-                            </p>
-                            <form th:if="${#authorization.expression('isAuthenticated()')}" th:action="@{/api/participations/olympiad/{id}(id=${olympiad.id})}" method="post" style="display:inline;">
-                                <button type="submit" class="btn btn-primary">Участвовать</button>
-                            </form>
-                            <a th:if="${!#authorization.expression('isAuthenticated()')}" th:href="@{/login}" class="btn btn-outline-primary">Войти для участия</a>
                         </div>
                     </div>
+                    <div id="active-olympiad-empty-msg" class="alert alert-info mt-3 d-none">Таких олимпиад ещё не опубликовано!</div>
+                    <nav th:if="${activeOlympiads.size() > 6}">
+                        <ul class="pagination justify-content-center mt-3">
+                            <li class="page-item disabled"><span class="page-link">Пагинация</span></li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
 
-            <!-- Предстоящие олимпиады -->
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="h5 mb-0">Предстоящие олимпиады</h3>
-                </div>
-                <div class="card-body">
-                    <div th:if="${upcomingOlympiads.empty}" class="alert alert-info">
-                        Нет предстоящих олимпиад
+            <div class="olympiad-section upcoming">
+                <h4 class="mb-3">Предстоящие олимпиады</h4>
+                <div class="row mb-3">
+                    <div class="col-md-4 mb-2">
+                        <select class="form-select" id="upcoming-education-filter">
+                            <option value="">Все уровни образования</option>
+                            <option value="BACHELOR">Бакалавриат</option>
+                            <option value="MASTER">Магистратура</option>
+                            <option value="SPO">СПО</option>
+                        </select>
                     </div>
-                    <div th:each="olympiad : ${upcomingOlympiads}" class="card mb-3">
-                        <div class="card-body">
-                            <div th:if="${olympiad.imagePath != null}">
-                                <img th:src="@{'/olympiad_uploads/' + ${olympiad.imagePath}}" alt="Фото олимпиады" style="max-width: 120px; max-height: 80px; object-fit: cover; margin-bottom: 10px;">
+                    <div class="col-md-4 mb-2">
+                        <select class="form-select" id="upcoming-course-filter">
+                            <option value="">Все курсы</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                </div>
+                <div th:if="${upcomingOlympiads.empty}" class="alert alert-info">Нет предстоящих олимпиад</div>
+                <div th:unless="${upcomingOlympiads.empty}">
+                    <div class="olympiad-grid" id="upcoming-olympiad-grid">
+                        <div th:each="olympiad,iterStat : ${upcomingOlympiads}" class="card olympiad-card upcoming h-100 position-relative"
+                             th:attr="data-education=${olympiad.educationLevel != null ? olympiad.educationLevel.name : ''},data-course=${olympiad.courseNumber}">
+                            <span class="olympiad-badge olympiad-status-upcoming">Скоро</span>
+                            <img th:if="${olympiad.imagePath != null}" th:src="@{'/olympiad_uploads/' + ${olympiad.imagePath}}" class="olympiad-img-large" alt="Фото олимпиады">
+                            <div class="card-body text-center">
+                                <h5 class="card-title mb-2" th:text="${olympiad.name}">Название олимпиады</h5>
+                                <div class="olympiad-meta" th:text="'Курс: ' + ${olympiad.courseNumber} + ', ' + (${olympiad.educationLevel != null ? olympiad.educationLevel.displayName : ''})"></div>
+                                <div class="text-muted mb-2" th:text="'Сроки: ' + ${#temporals.format(olympiad.startDate, 'dd.MM.yyyy')} + ' — ' + ${#temporals.format(olympiad.endDate, 'dd.MM.yyyy')}"></div>
+                                <p class="card-text olympiad-desc" th:text="${olympiad.description}">Описание олимпиады</p>
+                                <a th:href="@{/olympiads/{id}(id=${olympiad.id})}" class="btn btn-outline-primary w-100 mb-2">Подробнее</a>
+                                <a th:if="${#authorization.expression('isAuthenticated()')}" th:href="@{/api/participations/olympiad/{id}/confirm(id=${olympiad.id})}" class="btn btn-success w-100">Записаться на участие</a>
+                                <a th:if="${!#authorization.expression('isAuthenticated()')}" th:href="@{/login(redirect='/api/participations/olympiad/' + ${olympiad.id} + '/confirm')}" class="btn btn-success w-100">Записаться на участие</a>
                             </div>
-                            <h4 class="card-title" th:text="${olympiad.name}">Название олимпиады</h4>
-                            <p class="card-text">
-                                <strong>Сроки проведения:</strong><br>
-                                Начало: <span th:text="${#temporals.format(olympiad.startDate, 'dd.MM.yyyy HH:mm')}"></span><br>
-                                Окончание: <span th:text="${#temporals.format(olympiad.endDate, 'dd.MM.yyyy HH:mm')}"></span>
-                            </p>
-                            <a th:href="@{/olympiads/{id}(id=${olympiad.id})}" class="btn btn-outline-primary">Подробнее</a>
-                            <a th:href="@{/api/participations/olympiad/{olympiadId}/confirm(olympiadId=${olympiad.id})}" class="btn btn-success" style="margin-left: 10px;">Записаться на участие</a>
                         </div>
                     </div>
+                    <div id="upcoming-olympiad-empty-msg" class="alert alert-info mt-3 d-none">Таких олимпиад ещё не опубликовано!</div>
+                    <nav th:if="${upcomingOlympiads.size() > 6}">
+                        <ul class="pagination justify-content-center mt-3">
+                            <li class="page-item disabled"><span class="page-link">Пагинация</span></li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
 
-            <!-- Завершенные олимпиады -->
-            <div class="card mb-4">
-                <div class="card-header bg-secondary text-white">
-                    <h3 class="h5 mb-0">Завершенные олимпиады</h3>
-                </div>
-                <div class="card-body">
-                    <div th:if="${pastOlympiads.empty}" class="alert alert-info">
-                        Нет завершенных олимпиад
+            <div class="olympiad-section finished">
+                <h4 class="mb-3">Завершённые олимпиады</h4>
+                <div class="row mb-3">
+                    <div class="col-md-4 mb-2">
+                        <select class="form-select" id="finished-education-filter">
+                            <option value="">Все уровни образования</option>
+                            <option value="BACHELOR">Бакалавриат</option>
+                            <option value="MASTER">Магистратура</option>
+                            <option value="SPO">СПО</option>
+                        </select>
                     </div>
-                    <div th:each="olympiad : ${pastOlympiads}" class="card mb-3">
-                        <div class="card-body">
-                            <div th:if="${olympiad.imagePath != null}">
-                                <img th:src="@{'/olympiad_uploads/' + ${olympiad.imagePath}}" alt="Фото олимпиады" style="max-width: 120px; max-height: 80px; object-fit: cover; margin-bottom: 10px;">
+                    <div class="col-md-4 mb-2">
+                        <select class="form-select" id="finished-course-filter">
+                            <option value="">Все курсы</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                </div>
+                <div th:if="${pastOlympiads.empty}" class="alert alert-info">Нет завершённых олимпиад</div>
+                <div th:unless="${pastOlympiads.empty}">
+                    <div class="olympiad-grid" id="finished-olympiad-grid">
+                        <div th:each="olympiad,iterStat : ${pastOlympiads}" class="card olympiad-card finished h-100 position-relative"
+                             th:attr="data-education=${olympiad.educationLevel != null ? olympiad.educationLevel.name : ''},data-course=${olympiad.courseNumber}">
+                            <span class="olympiad-badge olympiad-status-finished">Завершена</span>
+                            <img th:if="${olympiad.imagePath != null}" th:src="@{'/olympiad_uploads/' + ${olympiad.imagePath}}" class="olympiad-img-large" alt="Фото олимпиады">
+                            <div class="card-body text-center">
+                                <h5 class="card-title mb-2" th:text="${olympiad.name}">Название олимпиады</h5>
+                                <div class="olympiad-meta" th:text="'Курс: ' + ${olympiad.courseNumber} + ', ' + (${olympiad.educationLevel != null ? olympiad.educationLevel.displayName : ''})"></div>
+                                <div class="text-muted mb-2" th:text="'Сроки: ' + ${#temporals.format(olympiad.startDate, 'dd.MM.yyyy')} + ' — ' + ${#temporals.format(olympiad.endDate, 'dd.MM.yyyy')}"></div>
+                                <p class="card-text olympiad-desc" th:text="${olympiad.description}">Описание олимпиады</p>
+                                <a th:href="@{/api/results/olympiad/{id}(id=${olympiad.id})}" class="btn btn-blue w-100 mt-2">Результаты олимпиады</a>
                             </div>
-                            <h4 class="card-title" th:text="${olympiad.name}">Название олимпиады</h4>
-                            <p class="card-text">
-                                <strong>Сроки проведения:</strong><br>
-                                Начало: <span th:text="${#temporals.format(olympiad.startDate, 'dd.MM.yyyy HH:mm')}"></span><br>
-                                Окончание: <span th:text="${#temporals.format(olympiad.endDate, 'dd.MM.yyyy HH:mm')}"></span>
-                            </p>
-                            <a th:href="@{/user/olympiad/{id}/results(id=${olympiad.id})}" class="btn btn-outline-secondary">Результаты</a>
                         </div>
                     </div>
+                    <div id="finished-olympiad-empty-msg" class="alert alert-info mt-3 d-none">Таких олимпиад ещё не опубликовано!</div>
+                    <nav th:if="${pastOlympiads.size() > 6}">
+                        <ul class="pagination justify-content-center mt-3">
+                            <li class="page-item disabled"><span class="page-link">Пагинация</span></li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </div>
     </div>
-    <footer class="bg-dark text-white py-4">
+    <footer class="bg-dark text-white py-4" style="min-height:70px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;">
         <div class="container text-center">
             <p>&copy; 2025 Олимпиады Муромского Института ВлГУ. Все права защищены.</p>
         </div>
@@ -177,7 +365,245 @@
                 var toast2 = new bootstrap.Toast(toastEl2, { delay: 4000 });
                 toast2.show();
             }
+            if (getUrlParam('error') === 'not_allowed') {
+                var toastEl3 = document.getElementById('notAllowedToast');
+                toastEl3.style.display = '';
+                var toast3 = new bootstrap.Toast(toastEl3, { delay: 4000 });
+                toast3.show();
+            }
+            // Кнопка "Вверх"
+            const scrollTopBtn = document.getElementById('scrollTopBtn');
+            if (scrollTopBtn) {
+                scrollTopBtn.onclick = function() {
+                    window.scrollTo({top: 0, behavior: 'smooth'});
+                };
+            }
+            // Кнопка "Помощь?"
+            const helpBtn = document.getElementById('helpBtn');
+            if (helpBtn) {
+                helpBtn.onclick = function() {
+                    var modal = new bootstrap.Modal(document.getElementById('helpModal'));
+                    modal.show();
+                };
+            }
+            // Гостевой режим
+            function getGuestId() {
+                let id = localStorage.getItem('guestId');
+                if (!id) {
+                    id = 'g' + Math.random().toString(36).substring(2, 12);
+                    localStorage.setItem('guestId', id);
+                }
+                return id;
+            }
+            let guestNicknameModal = new bootstrap.Modal(document.getElementById('guestNicknameModal'));
+            function getGuestNickname(showModalIfEmpty = true) {
+                let nick = localStorage.getItem('guestNickname');
+                if ((!nick || !nick.trim()) && showModalIfEmpty) {
+                    guestNicknameModal.show();
+                    return null;
+                }
+                return nick;
+            }
+            function isAuthenticated() {
+                return document.querySelector('a[href="/user/profile"]') !== null;
+            }
+            function loadMessages() {
+                let url = '/api/messages';
+                let params = [];
+                if (!isAuthenticated()) {
+                    params.push('guestId=' + encodeURIComponent(getGuestId()));
+                }
+                if (params.length) url += '?' + params.join('&');
+                chatMessages.innerHTML = '<div class="text-muted text-center">Загрузка сообщений...</div>';
+                fetch(url).then(r=>r.json()).then(data => {
+                    let hasNew = false;
+                    chatMessages.innerHTML = '';
+                    data.forEach(msg => {
+                        const div = document.createElement('div');
+                        div.className = 'mb-2 ' + (msg.fromAdmin ? 'text-end' : '');
+                        if (!msg.read && msg.fromAdmin) {
+                            div.style.backgroundColor = '#f0f0f0';
+                            hasNew = true;
+                            // Пометить как прочитанное
+                            fetch(`/api/messages/${msg.id}/read`, {method:'PUT'});
+                        }
+                        div.innerHTML = `<span class="badge bg-${msg.fromAdmin ? 'secondary' : 'primary'}">${msg.nickname ? msg.nickname : (msg.fromAdmin ? 'Админ' : 'Вы')}</span> <span>${msg.content}</span><div class="small text-muted">${msg.createdAt.replace('T',' ').slice(0,16)}</div>`;
+                        chatMessages.appendChild(div);
+                    });
+                    if (hasNew) {
+                        var toastEl = document.getElementById('newMsgToast');
+                        toastEl.style.display = '';
+                        var toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+                        toast.show();
+                    }
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    chatLoaded = true;
+                });
+            }
+            document.getElementById('saveGuestNicknameBtn').onclick = function() {
+                const val = document.getElementById('guestNicknameInput').value.trim();
+                if (val) {
+                    localStorage.setItem('guestNickname', val);
+                    guestNicknameModal.hide();
+                    loadMessages();
+                    chatInput.focus();
+                }
+            };
+            sendChatBtn.onclick = function() {
+                const text = chatInput.value.trim();
+                if (!text) return;
+                if (!isAuthenticated() && !getGuestNickname(false)) {
+                    guestNicknameModal.show();
+                    return;
+                }
+                sendChatBtn.disabled = true;
+                let url = '/api/messages';
+                let body = {content: text};
+                if (!isAuthenticated()) {
+                    url += '?guestId=' + encodeURIComponent(getGuestId());
+                    body.nickname = getGuestNickname(false);
+                }
+                fetch(url, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(body)
+                }).then(r=>r.json()).then(() => {
+                    chatInput.value = '';
+                    sendChatBtn.disabled = false;
+                    loadMessages();
+                });
+            };
+            chatInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') sendChatBtn.click();
+            });
+            document.getElementById('chatModal').addEventListener('hidden.bs.modal', function() {
+                if (chatInterval) {
+                    clearInterval(chatInterval);
+                    chatInterval = null;
+                }
+            });
+            // Кнопка "Изменить ник"
+            const chatFooter = document.querySelector('#chatModal .modal-footer');
+            if (chatFooter && !isAuthenticated()) {
+                let changeNickBtn = document.getElementById('changeNickBtn');
+                if (!changeNickBtn) {
+                    changeNickBtn = document.createElement('button');
+                    changeNickBtn.id = 'changeNickBtn';
+                    changeNickBtn.className = 'btn btn-outline-secondary ms-2';
+                    changeNickBtn.textContent = 'Изменить ник';
+                    changeNickBtn.onclick = function() {
+                        document.getElementById('guestNicknameInput').value = getGuestNickname(false) || '';
+                        guestNicknameModal.show();
+                    };
+                    chatFooter.appendChild(changeNickBtn);
+                }
+            }
+            if (document.getElementById('registerToast')) {
+                var toast = new bootstrap.Toast(document.getElementById('registerToast'), { delay: 4000 });
+                toast.show();
+            }
+            if (document.getElementById('alreadyRegisteredToast')) {
+                var toast2 = new bootstrap.Toast(document.getElementById('alreadyRegisteredToast'), { delay: 4000 });
+                toast2.show();
+            }
+            if (document.getElementById('notAllowedToast')) {
+                var toast3 = new bootstrap.Toast(document.getElementById('notAllowedToast'), { delay: 4000 });
+                toast3.show();
+            }
         });
+
+        // Фильтрация для каждого блока
+        function setupOlympiadFilters(gridId, educationFilterId, courseFilterId, emptyMsgId) {
+            const grid = document.getElementById(gridId);
+            const educationSelect = document.getElementById(educationFilterId);
+            const courseSelect = document.getElementById(courseFilterId);
+            const emptyMsg = document.getElementById(emptyMsgId);
+            if (!grid || !educationSelect || !courseSelect) return;
+            function filterOlympiads() {
+                const education = educationSelect.value;
+                const course = courseSelect.value;
+                let visibleCount = 0;
+                Array.from(grid.children).forEach(card => {
+                    const cardEducation = card.getAttribute('data-education') || '';
+                    const cardCourse = card.getAttribute('data-course') || '';
+                    let show = true;
+                    if (education && cardEducation !== education) show = false;
+                    if (course && cardCourse !== course) show = false;
+                    card.style.display = show ? '' : 'none';
+                    if (show) visibleCount++;
+                });
+                if (emptyMsg) emptyMsg.classList.toggle('d-none', visibleCount !== 0);
+            }
+            educationSelect.addEventListener('change', filterOlympiads);
+            courseSelect.addEventListener('change', filterOlympiads);
+        }
+        setupOlympiadFilters('active-olympiad-grid', 'active-education-filter', 'active-course-filter', 'active-olympiad-empty-msg');
+        setupOlympiadFilters('upcoming-olympiad-grid', 'upcoming-education-filter', 'upcoming-course-filter', 'upcoming-olympiad-empty-msg');
+        setupOlympiadFilters('finished-olympiad-grid', 'finished-education-filter', 'finished-course-filter', 'finished-olympiad-empty-msg');
+    </script>
+
+    <!-- Кнопка "Вверх" -->
+    <button id="scrollTopBtn" title="Наверх" style="position:fixed;bottom:90px;right:32px;z-index:9999;width:48px;height:48px;border-radius:50%;background:#2563eb;color:#fff;border:none;box-shadow:0 2px 8px rgba(37,99,235,0.12);font-size:2rem;align-items:center;justify-content:center;transition:background 0.2s;display:flex;">
+        <i class="bi bi-arrow-up"></i>
+    </button>
+    <!-- Кнопка "Помощь?" -->
+    <button class="help-btn" id="helpBtn" title="Помощь" style="position:fixed;bottom:24px;right:32px;z-index:9999;width:56px;height:56px;border-radius:50%;background:#10b981;color:#fff;border:none;box-shadow:0 2px 8px rgba(16,185,129,0.12);font-size:1.5rem;display:flex;align-items:center;justify-content:center;">
+        <i class="bi bi-question-lg"></i>
+    </button>
+    <!-- Модальное окно помощи -->
+    <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="helpModalLabel">Помощь по платформе</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+          </div>
+          <div class="modal-body">
+            <div th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <b>Вы администратор.</b><br>
+                • Управляйте олимпиадами, заданиями и результатами.<br>
+                • Используйте меню для перехода между разделами.<br>
+            </div>
+            <div th:if="${#authorization.expression('isAuthenticated()') and !#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <b>Вы авторизованный пользователь.</b><br>
+                • Участвуйте и записывайтесь на доступные олимпиады.<br>
+                • Просматривайте свои результаты и рейтинг.<br>
+                • Используйте фильтры по уровню образования и курсу для поиска нужных олимпиад.<br>
+                <button class="btn btn-primary mt-3 w-100" id="feedbackBtnHelpModal"><i class="bi bi-chat-dots me-2"></i>Связаться с администратором</button>
+            </div>
+            <div th:unless="${#authorization.expression('isAuthenticated()')}">
+                <b>Вы гость.</b><br>
+                • Просматривайте информацию о олимпиадах.<br>
+                • Для участия и записи на олимпиаду войдите или зарегистрируйтесь.<br>
+                • Используйте фильтры по уровню образования и курсу для поиска нужных олимпиад.<br>
+                <button class="btn btn-primary mt-3 w-100" id="feedbackBtnHelpModal"><i class="bi bi-chat-dots me-2"></i>Связаться с администратором</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Модальное окно для ввода ника гостя -->
+    <div class="modal fade" id="guestNicknameModal" tabindex="-1" aria-labelledby="guestNicknameModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="guestNicknameModalLabel">Введите имя для чата</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+          </div>
+          <div class="modal-body">
+            <input type="text" id="guestNicknameInput" class="form-control" placeholder="Ваш ник (например, Гость)">
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary" id="saveGuestNicknameBtn">Сохранить</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+        document.getElementById('helpBtn').onclick = function() {
+            var modal = new bootstrap.Modal(document.getElementById('helpModal'));
+            modal.show();
+        };
     </script>
 </body>
 </html> 

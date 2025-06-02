@@ -11,7 +11,28 @@
         .main-content { flex: 1 0 auto; }
         /* form { max-width: 700px; margin: 0 auto; } */
         .form-actions { margin-bottom: 32px; }
-        footer { flex-shrink: 0; background: #212529; color: #fff; border-top: 1px solid #343a40; text-align: center; padding: 12px 0 10px 0; font-size: 1rem; width: 100%; position: static; margin-top: 0; }
+        .navbar {
+            min-height: 70px !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        .navbar .container { padding-left: 0; padding-right: 0; }
+        footer {
+            flex-shrink: 0;
+            background: #212529;
+            color: #fff;
+            border-top: 1px solid #343a40;
+            text-align: center;
+            padding: 0;
+            font-size: 1.1rem;
+            width: 100%;
+            position: static;
+            margin-top: 0;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
@@ -30,7 +51,7 @@
                 <input type="text" class="form-control" id="name" name="name" th:value="${olympiad.name}" required data-bs-toggle="tooltip" data-bs-placement="right" title="Заполните это поле">
             </div>
             <div class="mb-3">
-                <label for="image" class="form-label">Фото олимпиады (опционально)</label>
+                <label for="image" class="form-label">Фото олимпиады <span style="color:red">*</span></label>
                 <div id="imagePreviewContainer" style="display: flex; flex-direction: row; align-items: center; gap: 16px; margin-top: 10px;">
                     <th:block th:if="${olympiad.imagePath != null}">
                         <img th:src="@{'/olympiad_uploads/' + ${olympiad.imagePath}}" alt="Фото олимпиады" id="previewImg" style="width: 320px; max-width: 100%; height: auto; object-fit: contain; border: 2px solid #dee2e6; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
@@ -38,7 +59,7 @@
                         <input type="hidden" name="removeImage" id="removeImage" value="false">
                     </th:block>
                 </div>
-                <input type="file" class="form-control mt-2" id="image" name="image" accept="image/*" onchange="showOlympiadImagePreview(this)">
+                <input type="file" class="form-control mt-2" id="image" name="image" accept="image/*" onchange="showOlympiadImagePreview(this)" th:required="${olympiad.imagePath == null}">
             </div>
             <div class="mb-3">
                 <label for="description" class="form-label">Описание олимпиады</label>
@@ -63,6 +84,7 @@
                 <select class="form-control" id="educationLevel" name="educationLevel" required onchange="updateCourseNumberOptions()">
                     <option th:value="'BACHELOR'" th:selected="${olympiad.educationLevel == 'BACHELOR'}">Бакалавриат</option>
                     <option th:value="'MASTER'" th:selected="${olympiad.educationLevel == 'MASTER'}">Магистратура</option>
+                    <option th:value="'SPO'" th:selected="${olympiad.educationLevel == 'SPO'}">СПО</option>
                 </select>
             </div>
             <div class="mb-3">
@@ -94,13 +116,55 @@
         </div>
     </div>
 </div>
+<!-- Кнопка "Вверх" -->
+<button id="scrollTopBtn" title="Наверх" style="display:none;position:fixed;bottom:90px;right:32px;z-index:9999;width:48px;height:48px;border-radius:50%;background:#2563eb;color:#fff;border:none;box-shadow:0 2px 8px rgba(37,99,235,0.12);font-size:2rem;align-items:center;justify-content:center;transition:background 0.2s;">
+    <i class="bi bi-arrow-up"></i>
+</button>
+<!-- Кнопка "Помощь?" -->
+<button id="helpBtn" style="position:fixed;bottom:24px;right:32px;z-index:9999;width:56px;height:56px;border-radius:50%;background:#10b981;color:#fff;border:none;box-shadow:0 2px 8px rgba(16,185,129,0.12);font-size:1.5rem;display:flex;align-items:center;justify-content:center;">
+    <i class="bi bi-question-lg"></i>
+</button>
+<!-- Модальное окно помощи -->
+<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="helpModalLabel">Помощь по заполнению олимпиады</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+      </div>
+      <div class="modal-body">
+        <ul>
+          <li>Поля <b>Название</b>, <b>Описание</b>, <b>Возраст</b>, <b>Даты</b> и <b>Уровень образования</b> обязательны.</li>
+          <li>Для <b>СПО</b> минимальный возраст — 15 лет, для бакалавриата — 17, для магистратуры — 21.</li>
+          <li>Фото олимпиады — по желанию, но оно украсит карточку!</li>
+          <li>Курс зависит от уровня образования.</li>
+          <li>Если возникли вопросы — обратитесь к администратору.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 function updateCourseNumberOptions() {
     const educationLevel = document.getElementById('educationLevel').value;
     const courseNumber = document.getElementById('courseNumber');
+    const ageInput = document.getElementById('age');
     courseNumber.innerHTML = '';
-    let max = educationLevel === 'BACHELOR' ? 4 : 2;
+    let max = 4;
+    let minAge = 17;
+    if (educationLevel === 'MASTER') {
+        max = 2;
+        minAge = 21;
+    } else if (educationLevel === 'SPO') {
+        max = 4;
+        minAge = 15;
+    }
+    ageInput.min = minAge;
+    // Если текущее значение меньше min, сбросить
+    if (ageInput.value && parseInt(ageInput.value) < minAge) {
+        ageInput.value = minAge;
+    }
     for (let i = 1; i <= max; i++) {
         const option = document.createElement('option');
         option.value = i;
@@ -176,6 +240,14 @@ olympiadForm.addEventListener('submit', function(e) {
         showDateValidationToast('Дата окончания не может быть раньше даты начала!');
         e.preventDefault();
     }
+    const imageInput = document.getElementById('image');
+    const hasImage = imageInput && imageInput.files && imageInput.files.length > 0;
+    const hasOldImage = document.getElementById('previewImg') !== null;
+    if (!hasImage && !hasOldImage) {
+        alert('Пожалуйста, добавьте фото олимпиады!');
+        e.preventDefault();
+        return;
+    }
 });
 function showDateValidationToast(message) {
     const toastDiv = document.getElementById('dateValidationToast');
@@ -210,6 +282,24 @@ document.addEventListener('DOMContentLoaded', function() {
         updateEndDateMin();
     }
 });
+
+// Кнопка "Вверх"
+const scrollTopBtn = document.getElementById('scrollTopBtn');
+window.addEventListener('scroll', function() {
+    if (window.scrollY > 300) {
+        scrollTopBtn.style.display = 'flex';
+    } else {
+        scrollTopBtn.style.display = 'none';
+    }
+});
+scrollTopBtn.onclick = function() {
+    window.scrollTo({top: 0, behavior: 'smooth'});
+};
+// Кнопка "Помощь?"
+document.getElementById('helpBtn').onclick = function() {
+    var modal = new bootstrap.Modal(document.getElementById('helpModal'));
+    modal.show();
+};
 </script>
 </body>
 </html>

@@ -28,64 +28,75 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="register-container">
-            <div class="card">
-                <div class="card-header text-center">
-                    <h3>Регистрация</h3>
-                </div>
-                <div class="card-body p-4">
-                    <a href="/" class="btn btn-primary mb-3">МИ ВлГУ</a>
-                    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
-                    <form th:action="@{/register}" method="post">
-                        <div class="mb-3">
-                            <label for="fullName" class="form-label">ФИО</label>
-                            <input type="text" class="form-control" id="fullName" name="fullName" required>
+    <div class="main-content" style="flex:1 0 auto; display:flex; flex-direction:column; min-height:100vh;">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="/">Олимпиады МИ ВлГУ</a>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="register-container">
+                <div class="card">
+                    <div class="card-header text-center">
+                        <h3>Регистрация</h3>
+                    </div>
+                    <div class="card-body p-4">
+                        <a href="/" class="btn btn-primary mb-3">МИ ВлГУ</a>
+                        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+                        <form th:action="@{/register}" method="post">
+                            <div class="mb-3">
+                                <label for="fullName" class="form-label">ФИО</label>
+                                <input type="text" class="form-control" id="fullName" name="fullName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="birthDate" class="form-label">Дата рождения</label>
+                                <input type="date" class="form-control" id="birthDate" name="birthDate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="educationLevel" class="form-label">Ступень образования</label>
+                                <select class="form-control" id="educationLevel" name="educationLevel" required onchange="updateCourseOptions()">
+                                    <option value="BACHELOR">Бакалавриат</option>
+                                    <option value="MASTER">Магистратура</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="courseNumber" class="form-label">Курс</label>
+                                <select class="form-control" id="courseNumber" name="courseNumber" required>
+                                    <option value="1">1 курс</option>
+                                    <option value="2">2 курс</option>
+                                    <option value="3">3 курс</option>
+                                    <option value="4">4 курс</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Пароль</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="confirmPassword" class="form-label">Подтверждение пароля</label>
+                                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+                            </div>
+                        </form>
+                        <div class="text-center mt-3">
+                            <p>Уже есть аккаунт? <a href="/login">Войти</a></p>
                         </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="birthDate" class="form-label">Дата рождения</label>
-                            <input type="date" class="form-control" id="birthDate" name="birthDate" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="educationLevel" class="form-label">Ступень образования</label>
-                            <select class="form-control" id="educationLevel" name="educationLevel" required onchange="updateCourseOptions()">
-                                <option value="BACHELOR">Бакалавриат</option>
-                                <option value="MASTER">Магистратура</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="courseNumber" class="form-label">Курс</label>
-                            <select class="form-control" id="courseNumber" name="courseNumber" required>
-                                <option value="1">1 курс</option>
-                                <option value="2">2 курс</option>
-                                <option value="3">3 курс</option>
-                                <option value="4">4 курс</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Пароль</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="confirmPassword" class="form-label">Подтверждение пароля</label>
-                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
-                        </div>
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
-                        </div>
-                    </form>
-                    <div class="text-center mt-3">
-                        <p>Уже есть аккаунт? <a href="/login">Войти</a></p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
+    <footer class="footer bg-dark text-white py-4" style="flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#212529 !important;min-height:70px;">
+        <div class="container text-center">
+            <p>&copy; 2025 Олимпиады Муромского Института ВлГУ. Все права защищены.</p>
+        </div>
+    </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function updateCourseOptions() {

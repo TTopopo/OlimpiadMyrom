@@ -44,4 +44,22 @@ public class UserAnswerController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    @PostMapping("/{id}/flag")
+    public ResponseEntity<UserAnswer> setFlag(@PathVariable Long id, @RequestParam boolean flagged) {
+        UserAnswer userAnswer = userAnswerService.findById(id);
+        if (userAnswer != null) {
+            userAnswer.setFlagged(flagged);
+            userAnswerService.save(userAnswer);
+            return ResponseEntity.ok(userAnswer);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/finish-olympiad")
+    public ResponseEntity<String> finishOlympiad(@RequestParam Long userId, @RequestParam Long olympiadId) {
+        // Здесь можно добавить бизнес-логику завершения олимпиады (например, выставить статус)
+        // Пока просто возвращаем ok
+        return ResponseEntity.ok("Олимпиада завершена");
+    }
 } 

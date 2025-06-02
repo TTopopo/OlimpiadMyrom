@@ -58,7 +58,9 @@ public class AuthController {
         user.setCourseNumber(courseNumber);
         user.setPassword(passwordEncoder.encode(password));
         user.setRole(UserRole.USER);
-
+        // nickname по email до @
+        String nickname = email.contains("@") ? email.substring(0, email.indexOf("@")) : fullName.split(" ")[0];
+        user.setNickname(nickname);
         userRepository.save(user);
 
         // Автоматический вход после регистрации

@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
@@ -39,5 +41,25 @@ public class UserProfileController {
             model.addAttribute("userAnswers", userAnswers);
             return "user/profile";
         }
+    }
+
+    @GetMapping("/profile/edit-nickname")
+    public String editNicknameForm(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+        User user = userService.findByEmail(userDetails.getUsername());
+        model.addAttribute("user", user);
+        return "user/edit-nickname";
+    }
+
+    @PostMapping("/profile/edit-nickname")
+    public String updateNickname(@AuthenticationPrincipal UserDetails userDetails, @RequestParam String nickname, Model model) {
+        User user = userService.findByEmail(userDetails.getUsername());
+        if (nickname == null || nickname.trim().isEmpty()) {
+            model.addAttribute("user", user);
+            model.addAttribute("error", "Никнейм не может быть пустым!");
+            return "user/edit-nickname";
+        }
+        user.setNickname(nickname.trim());
+        userService.update(user.getId(), user);
+        return "redirect:/user/profile";
     }
 } 

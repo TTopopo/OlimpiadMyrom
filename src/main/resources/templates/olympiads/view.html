@@ -4,46 +4,278 @@
     <meta charset="UTF-8">
     <title th:text="${olympiad.name}">Просмотр олимпиады</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        html, body {
+            height: 100%;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .main-content {
+            flex: 1 0 auto;
+        }
+        footer {
+            flex-shrink: 0;
+            background: #212529;
+            color: #fff;
+            border-top: 1px solid #343a40;
+            text-align: center;
+            padding: 0;
+            font-size: 1.1rem;
+            width: 100%;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .olympiad-header-block {
+            background: linear-gradient(135deg, #eaf3ff 0%, #f6faff 100%);
+            border-radius: 18px;
+            padding: 0.7rem 0.7rem 0.7rem 0.7rem;
+            margin-bottom: 1.2rem;
+            text-align: center;
+        }
+        .container { margin-top: 0.7rem !important; margin-bottom: 0.7rem !important; }
+        .olympiad-cover-img {
+            max-width: 600px;
+            max-height: 360px;
+            width: 100%;
+            height: auto;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+            margin-bottom: 0.7rem;
+        }
+        .olympiad-header-block h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .olympiad-header-block .olympiad-desc {
+            font-size: 1rem;
+            color: #1746a2;
+            font-weight: 500;
+            margin-bottom: 0.7rem;
+        }
+        .olympiad-header-block .olympiad-dates {
+            font-size: 1rem;
+            color: #2563eb;
+            margin-bottom: 0.4rem;
+        }
+        .olympiad-header-block .olympiad-meta {
+            color: #6b7280;
+            font-size: 0.95rem;
+            margin-bottom: 0.4rem;
+        }
+        .btn-green {
+            background: #10b981;
+            color: #fff;
+            border: none;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(16,185,129,0.08);
+            transition: background 0.15s;
+        }
+        .btn-green:hover, .btn-green:focus {
+            background: #059669;
+            color: #fff;
+        }
+        .btn-grey {
+            background: #6c757d;
+            color: #fff;
+            border: none;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(108,117,125,0.08);
+            transition: background 0.15s;
+        }
+        .btn-grey:hover, .btn-grey:focus {
+            background: #495057;
+            color: #fff;
+        }
+        .btn-blue {
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(37,99,235,0.08);
+            transition: background 0.15s;
+        }
+        .btn-blue:hover, .btn-blue:focus {
+            background: #1746a2;
+            color: #fff;
+        }
+        .back-btn {
+            position: absolute;
+            left: 16px;
+            top: 16px;
+            background: none;
+            border: none;
+            color: #2563eb;
+            font-size: 1.5rem;
+            z-index: 2;
+        }
+        .help-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 32px;
+            z-index: 9999;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #10b981;
+            color: #fff;
+            border: none;
+            box-shadow: 0 2px 8px rgba(16,185,129,0.12);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-4">
-        <div class="row">
-            <div class="col-md-12">
-                <h2 th:text="${olympiad.name}">Название олимпиады</h2>
-                <p class="lead" th:text="${olympiad.description}">Описание олимпиады</p>
-                
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">Информация об олимпиаде</h5>
-                        <p><strong>Дата начала:</strong> <span th:text="${#temporals.format(olympiad.startDate, 'dd.MM.yyyy HH:mm')}"></span></p>
-                        <p><strong>Дата окончания:</strong> <span th:text="${#temporals.format(olympiad.endDate, 'dd.MM.yyyy HH:mm')}"></span></p>
-                        <p><strong>Уровень образования:</strong> <span th:text="${olympiad.educationLevel}"></span></p>
-                        <p><strong>Курс:</strong> <span th:text="${olympiad.courseNumber}"></span></p>
-                    </div>
-                </div>
-
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">Задания олимпиады</h5>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">Олимпиады МИ ВлГУ</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
+                    <a class="nav-link" th:href="@{/user/profile}">
+                        <i class="bi bi-person-circle"></i>
+                        <span th:text="${#authorization.expression('hasRole(''ROLE_ADMIN'')') ? 'Администратор' : #authentication.name}"></span>
+                    </a>
+                </li>
+                <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
+                    <a class="nav-link" th:href="@{/logout}">Выйти</a>
+                </li>
+                <li class="nav-item" th:unless="${#authorization.expression('isAuthenticated()')}">
+                    <a class="nav-link" th:href="@{/login}">Войти</a>
+                </li>
+                <li class="nav-item" th:unless="${#authorization.expression('isAuthenticated()')}">
+                    <a class="nav-link" th:href="@{/register}">Регистрация</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="main-content">
+    <div class="container mt-4 mb-5 position-relative" style="max-width:900px;">
+        <a href="javascript:history.back()" class="btn btn-outline-secondary mb-3" style="font-size:1.08rem;padding:0.5rem 1.2rem;"> <i class="bi bi-arrow-left"></i> Назад</a>
+        <div th:if="${param.error} == 'already_registered'" class="alert alert-info">Вы уже записаны на участие в этой олимпиаде.</div>
+        <div th:if="${param.error} == 'not_allowed'" class="alert alert-danger">Вы не можете участвовать в этой олимпиаде: ваш уровень образования или курс не соответствует требованиям.</div>
+        <div th:if="${param.success} == 'registered'" class="alert alert-success">Вы успешно записались на участие в олимпиаде!</div>
+        <div class="card shadow-sm p-4" style="max-width:680px;margin:0 auto;background:#eaf3ff;border-radius:18px;">
+            <div class="text-center mb-3">
+                <i class="bi bi-info-circle" style="font-size:2.5rem;color:#2563eb;"></i>
+                <h2 class="mt-2 mb-1" style="font-weight:700;color:#1e3c72;font-size:1.28rem;">Информация об олимпиаде</h2>
+            </div>
+            <div class="mb-2 text-center" style="font-size:1.11rem;">
+                <span style="color:#6b7280;">Название олимпиады:</span><br>
+                <b th:text="${olympiad.name}" style="font-size:1.19rem;"></b><br>
+                <span style="color:#2563eb;">Сроки: <span th:text="${#temporals.format(olympiad.startDate, 'dd.MM.yyyy HH:mm')}"></span> — <span th:text="${#temporals.format(olympiad.endDate, 'dd.MM.yyyy HH:mm')}"></span></span><br>
+                <span style="color:#6b7280;">Уровень: <span th:text="${olympiad.educationLevel.displayName}"></span> | Курс: <span th:text="${olympiad.courseNumber}"></span></span>
+            </div>
+            <img th:if="${olympiad.imagePath != null}" th:src="@{'/olympiad_uploads/' + ${olympiad.imagePath}}" alt="Фото олимпиады" style="max-width:370px;max-height:200px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08);margin:0 auto 1rem auto;display:block;">
+            <div class="mt-2 d-flex flex-column flex-md-row justify-content-center gap-2">
+                <a th:if="${#authorization.expression('isAuthenticated()') and !#authorization.expression('hasRole(''ROLE_ADMIN'')') and olympiad.status.name() == 'PUBLISHED'}" th:href="@{/api/participations/olympiad/{id}/confirm(id=${olympiad.id})}" class="btn btn-green btn-lg">Записаться на участие</a>
+                <a th:if="${!#authorization.expression('isAuthenticated()') and olympiad.status.name() == 'PUBLISHED'}" th:href="@{/login(redirect='/api/participations/olympiad/' + ${olympiad.id} + '/confirm')}" class="btn btn-green btn-lg">Записаться на участие</a>
+            </div>
+        </div>
+        <div th:if="${olympiad.status.name() == 'PUBLISHED'}">
+            <div class="alert alert-info text-center p-3" style="font-size:1.11rem;">
+                <b>Олимпиада ещё не началась!</b> Старт: <span th:text="${#temporals.format(olympiad.startDate, 'dd.MM.yyyy HH:mm')}"></span>
+            </div>
+        </div>
+        <div th:if="${olympiad.status.name() == 'ACTIVE'}">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Задания олимпиады</h5>
+                    <div th:if="${tasks != null && !tasks.isEmpty()}">
                         <div class="list-group">
-                            <div th:each="task : ${tasks}" class="list-group-item">
+                            <div class="list-group-item" th:each="task : ${tasks}">
                                 <h6 class="mb-1" th:text="${task.title}">Название задания</h6>
-                                <p class="mb-1" th:text="${task.taskText}">Описание задания</p>
+                                <p class="mb-1" th:text="${task.taskText}">Текст задания</p>
                                 <small>Максимальный балл: <span th:text="${task.maxScore}"></span></small>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="d-grid gap-2">
-                    <a th:href="@{/login}" class="btn btn-primary">Войти для участия</a>
-                    <a th:href="@{/register}" class="btn btn-secondary">Зарегистрироваться</a>
-                    <a th:href="@{/olympiads}" class="btn btn-outline-secondary">Вернуться к списку олимпиад</a>
+                    <div th:if="${tasks == null || tasks.isEmpty()}">
+                        <span class="text-muted">Задания пока не опубликованы.</span>
+                    </div>
                 </div>
             </div>
         </div>
+        <div th:if="${olympiad.status.name() == 'FINISHED'}">
+            <div class="alert alert-success text-center p-4" style="font-size:1.2rem;">
+                <b>Олимпиада завершена!</b><br>
+                <a th:href="@{'/user/olympiad/' + ${olympiad.id} + '/results'}" class="btn btn-outline-secondary mt-3">Смотреть результаты</a>
+            </div>
+        </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</div>
+<!-- Кнопка "Помощь?" -->
+<button class="help-btn" id="helpBtn" title="Помощь">
+    <i class="bi bi-question-lg"></i>
+</button>
+<!-- Модальное окно помощи -->
+<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="helpModalLabel">Помощь по странице олимпиады</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+      </div>
+      <div class="modal-body">
+        <div th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+            <b>Вы администратор.</b><br>
+            • Вы можете редактировать параметры олимпиады, управлять заданиями и просматривать результаты.<br>
+            • Для возврата к панели администратора используйте меню сверху.<br>
+        </div>
+        <div th:if="${#authorization.expression('isAuthenticated()') and !#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+            <b>Вы авторизованный пользователь.</b><br>
+            • Здесь вы можете ознакомиться с информацией об олимпиаде.<br>
+            • Если олимпиада активна — участвуйте и выполняйте задания.<br>
+            • После завершения олимпиады вы сможете посмотреть свои результаты.<br>
+            <button class="btn btn-primary mt-3 w-100" id="feedbackBtnHelpModal"><i class="bi bi-chat-dots me-2"></i>Связаться с администратором</button>
+        </div>
+        <div th:unless="${#authorization.expression('isAuthenticated()')}">
+            <b>Вы гость.</b><br>
+            • Вы можете просматривать информацию о олимпиадах.<br>
+            • Для участия войдите или зарегистрируйтесь.<br>
+            • После завершения олимпиады вы сможете посмотреть результаты.<br>
+            <button class="btn btn-primary mt-3 w-100" id="feedbackBtnHelpModal"><i class="bi bi-chat-dots me-2"></i>Связаться с администратором</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<footer class="bg-dark text-white py-4" style="min-height:70px;display:flex;align-items:center;justify-content:center;">
+    <div class="container text-center">
+        <p>&copy; 2025 Олимпиады Муромского Института ВлГУ. Все права защищены.</p>
+    </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById('helpBtn').onclick = function() {
+        var modal = new bootstrap.Modal(document.getElementById('helpModal'));
+        modal.show();
+    };
+    document.addEventListener('DOMContentLoaded', function() {
+        var btn = document.getElementById('feedbackBtnHelpModal');
+        if (btn) {
+            btn.onclick = function() {
+                var feedbackModal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+                feedbackModal.show();
+            };
+        }
+    });
+</script>
 </body>
 </html> 

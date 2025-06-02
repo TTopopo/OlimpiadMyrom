@@ -93,21 +93,24 @@ public class AdminOlympiadController {
         olympiad.setEndDate(end);
         olympiad.setStatus(com.olimpiada.entity.OlympiadStatus.DRAFT);
         // --- Обработка фото ---
-        if (image != null && !image.isEmpty()) {
-            try {
-                String uploadDir = "olympiad_uploads";
-                String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
-                Path uploadPath = Paths.get(uploadDir);
-                if (!Files.exists(uploadPath)) {
-                    Files.createDirectories(uploadPath);
-                }
-                image.transferTo(uploadPath.resolve(fileName));
-                olympiad.setImagePath(fileName);
-            } catch (Exception e) {
-                model.addAttribute("error", "Ошибка при загрузке фото: " + e.getMessage());
-                model.addAttribute("olympiad", olympiad);
-                return "admin/olympiad-form";
+        if (image == null || image.isEmpty()) {
+            model.addAttribute("olympiad", olympiad);
+            model.addAttribute("error", "Пожалуйста, добавьте фото олимпиады!");
+            return "admin/olympiad-form";
+        }
+        try {
+            String uploadDir = "olympiad_uploads";
+            String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
+            Path uploadPath = Paths.get(uploadDir);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
             }
+            image.transferTo(uploadPath.resolve(fileName));
+            olympiad.setImagePath(fileName);
+        } catch (Exception e) {
+            model.addAttribute("error", "Ошибка при загрузке фото: " + e.getMessage());
+            model.addAttribute("olympiad", olympiad);
+            return "admin/olympiad-form";
         }
         // --- /Обработка фото ---
         olympiadService.save(olympiad);
@@ -176,6 +179,14 @@ public class AdminOlympiadController {
         olympiad.setStartDate(start);
         olympiad.setEndDate(end);
         // --- Обработка фото ---
+        boolean noOldImage = olympiad.getImagePath() == null || olympiad.getImagePath().isEmpty();
+        boolean removeOld = "true".equals(removeImage);
+        boolean noNewImage = image == null || image.isEmpty();
+        if ((noOldImage || removeOld) && noNewImage) {
+            model.addAttribute("olympiad", olympiad);
+            model.addAttribute("error", "Пожалуйста, добавьте фото олимпиады!");
+            return "admin/olympiad-form";
+        }
         try {
             if ("true".equals(removeImage)) {
                 // Удалить старый файл, если был
@@ -211,6 +222,11 @@ public class AdminOlympiadController {
 
     @PostMapping("/delete/{id}")
     public String deleteOlympiad(@PathVariable Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        Olympiad olympiad = olympiadService.findById(id);
+        if (olympiad.getStatus() == com.olimpiada.entity.OlympiadStatus.ACTIVE) {
+            redirectAttributes.addFlashAttribute("error", "Нельзя удалить активную олимпиаду!");
+            return "redirect:/admin/olympiads";
+        }
         olympiadService.deleteById(id);
         redirectAttributes.addFlashAttribute("success", "Олимпиада успешно удалена");
         return "redirect:/admin/olympiads";
@@ -242,14 +258,27 @@ public class AdminOlympiadController {
     }
 
     private String validateEducationAndCourse(String educationLevel, Integer courseNumber, Integer age) {
-        if (age != null && age < 17) {
-            return "Минимальный возраст участников — 17 лет";
-        }
-        if (educationLevel.equals("BACHELOR") && (courseNumber < 1 || courseNumber > 4)) {
-            return "Для бакалавриата допустимы только курсы 1-4";
-        }
-        if (educationLevel.equals("MASTER") && (courseNumber < 1 || courseNumber > 2)) {
-            return "Для магистратуры допустимы только курсы 1-2";
+        if (educationLevel.equals("SPO")) {
+            if (age != null && age < 15) {
+                return "Минимальный возраст участников для СПО — 15 лет";
+            }
+            if (courseNumber < 1 || courseNumber > 4) {
+                return "Для СПО допустимы только курсы 1-4";
+            }
+        } else if (educationLevel.equals("BACHELOR")) {
+            if (age != null && age < 17) {
+                return "Минимальный возраст участников для бакалавриата — 17 лет";
+            }
+            if (courseNumber < 1 || courseNumber > 4) {
+                return "Для бакалавриата допустимы только курсы 1-4";
+            }
+        } else if (educationLevel.equals("MASTER")) {
+            if (age != null && age < 21) {
+                return "Минимальный возраст участников для магистратуры — 21 год";
+            }
+            if (courseNumber < 1 || courseNumber > 2) {
+                return "Для магистратуры допустимы только курсы 1-2";
+            }
         }
         return null;
     }

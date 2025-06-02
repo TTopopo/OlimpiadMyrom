@@ -3,6 +3,7 @@ package com.olimpiada.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
+import java.util.List;
 
 @Data
 @ToString(exclude = "olympiad")
@@ -41,6 +42,9 @@ public class Task {
 
     @Column(name = "image_path")
     private String imagePath;
+
+    @Transient
+    private List<String> optionsList;
 
     public Long getId() {
         return id;
@@ -106,15 +110,6 @@ public class Task {
         this.olympiad = olympiad;
     }
 
-    @jakarta.persistence.Transient
-    public java.util.List<String> getOptionsList() {
-        if (options == null || options.isEmpty()) return java.util.List.of();
-        return java.util.Arrays.stream(options.split(";"))
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .toList();
-    }
-
     public String getDisplayCorrectAnswer() {
         return displayCorrectAnswer;
     }
@@ -129,5 +124,18 @@ public class Task {
 
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
+    }
+
+    public void setOptionsList(List<String> optionsList) {
+        this.optionsList = optionsList;
+    }
+
+    @jakarta.persistence.Transient
+    public List<String> getOptionsList() {
+        if (options == null || options.isEmpty()) return List.of();
+        return java.util.Arrays.stream(options.split(";"))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
     }
 } 

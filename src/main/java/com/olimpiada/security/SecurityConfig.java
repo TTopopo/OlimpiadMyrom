@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -18,14 +19,18 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/register", "/login", "/start", "/olympiads", "/olympiads/**", "/api/auth/register", "/css/**", "/js/**", "/images/**", "/olympiad_uploads/**").permitAll()
+                .requestMatchers("/api/results/olympiad/**").permitAll()
+                .requestMatchers("/api/messages", "/api/messages/").permitAll()
+                .requestMatchers("/api/messages/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/user/profile").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/user/olympiad/**").hasRole("USER")
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/feedback").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
                 .loginPage("/login")
-                .defaultSuccessUrl("/", true)
+                .successHandler(customAuthenticationSuccessHandler())
                 .failureUrl("/login?error")
                 .permitAll()
             )
@@ -41,5 +46,10 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
+        return new com.olimpiada.security.CustomAuthenticationSuccessHandler();
     }
 } 

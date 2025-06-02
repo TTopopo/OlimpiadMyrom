@@ -4,22 +4,121 @@
     <meta charset="UTF-8">
     <title th:text="${olympiad.name}">Олимпиада</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        html, body { height: 100%; }
+        body { min-height: 100vh; display: flex; flex-direction: column; }
+        .main-content { flex: 1 0 auto; }
+        .olympiad-header-block {
+            background: linear-gradient(135deg, #eaf3ff 0%, #f6faff 100%);
+            border-radius: 18px;
+            padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+            margin-bottom: 1.2rem;
+            text-align: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .olympiad-header-block h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .olympiad-header-block .olympiad-dates {
+            font-size: 1.1rem;
+            color: #2563eb;
+            margin-bottom: 0.4rem;
+        }
+        .olympiad-header-block .olympiad-meta {
+            color: #6b7280;
+            font-size: 1rem;
+            margin-bottom: 0.4rem;
+        }
+        .olympiad-header-block .olympiad-desc {
+            font-size: 1.1rem;
+            color: #1746a2;
+            font-weight: 500;
+            margin-bottom: 0.7rem;
+        }
+        .olympiad-header-block .olympiad-img {
+            max-width: 370px;
+            max-height: 200px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin: 0 auto 1rem auto;
+            display: block;
+        }
+        .footer {
+            background: #212529;
+            color: #fff;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+    </style>
 </head>
 <body>
-<div class="container mt-5">
-    <h2 th:text="${olympiad.name}"></h2>
-    <div class="alert alert-warning mb-4">
-        <b>Время на выполнение:</b> 60 минут
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">Олимпиады МИ ВлГУ</a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
+                    <a class="nav-link" th:href="@{/user/profile}">
+                        <i class="bi bi-person-circle"></i>
+                        <span th:text="${#authorization.expression('hasRole(''ROLE_ADMIN'')') ? 'Администратор' : #authentication.name}"></span>
+                    </a>
+                </li>
+                <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
+                    <a class="nav-link" th:href="@{/logout}">Выйти</a>
+                </li>
+                <li class="nav-item" th:unless="${#authorization.expression('isAuthenticated()')}">
+                    <a class="nav-link" th:href="@{/login(redirect='/olympiads')}">Войти</a>
+                </li>
+                <li class="nav-item" th:unless="${#authorization.expression('isAuthenticated()')}">
+                    <a class="nav-link" th:href="@{/register(redirect='/olympiads')}">Регистрация</a>
+                </li>
+            </ul>
+        </div>
     </div>
-    <div th:if="${error} == 'already_registered'" class="alert alert-info">
-        Вы уже зарегистрированы на эту олимпиаду. Вы можете начать выполнение в любой момент!
-    </div>
-    <div class="d-flex gap-3">
-        <form th:action="@{'/user/olympiad/' + ${olympiad.id} + '/active'}" method="get">
-            <button type="submit" class="btn btn-success btn-lg">Начать участие</button>
-        </form>
-        <a href="/olympiads" class="btn btn-secondary btn-lg">Назад</a>
+</nav>
+<div class="main-content">
+    <div class="container mt-5">
+        <a href="/olympiads" class="btn btn-outline-secondary mb-3" style="font-size:1.08rem;padding:0.5rem 1.2rem;">
+            <i class="bi bi-arrow-left"></i> Назад
+        </a>
+        <div class="olympiad-header-block">
+            <h2 th:text="${olympiad.name}"></h2>
+            <div class="olympiad-dates">
+                <b>Сроки:</b> <span th:text="${#temporals.format(olympiad.startDate, 'dd.MM.yyyy HH:mm')}"></span> — <span th:text="${#temporals.format(olympiad.endDate, 'dd.MM.yyyy HH:mm')}"></span>
+            </div>
+            <div class="olympiad-meta">
+                <span th:text="'Курс: ' + ${olympiad.courseNumber}"></span>,
+                <span th:text="${olympiad.educationLevel != null ? olympiad.educationLevel.displayName : ''}"></span>
+            </div>
+            <div class="olympiad-desc" th:text="${olympiad.description}"></div>
+            <img th:if="${olympiad.imagePath != null}" th:src="@{'/olympiad_uploads/' + ${olympiad.imagePath}}" class="olympiad-img" alt="Фото олимпиады">
+            <div class="alert alert-warning mb-3 mt-3">
+                <b>Время на выполнение:</b> 60 минут
+            </div>
+            <div th:if="${error} == 'already_registered'" class="alert alert-info mb-3">
+                Вы уже зарегистрированы на эту олимпиаду. Вы можете начать выполнение в любой момент!
+            </div>
+            <div class="d-flex gap-3 justify-content-center">
+                <form th:action="@{'/user/olympiad/' + ${olympiad.id} + '/active'}" method="get">
+                    <button type="submit" class="btn btn-success btn-lg">Начать участие</button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
+<footer class="footer">
+    <div class="container text-center">
+        <p>&copy; 2025 Олимпиады Муромского Института ВлГУ. Все права защищены.</p>
+    </div>
+</footer>
 </body>
 </html> 

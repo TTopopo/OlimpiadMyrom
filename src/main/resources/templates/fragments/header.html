@@ -16,7 +16,7 @@
                 <li class="nav-item dropdown" th:if="${#authorization.expression('isAuthenticated()')}">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
                         <i class="bi bi-person-circle"></i>
-                        <span th:text="${#authentication.principal.fullName != null ? #authentication.principal.fullName : #authentication.name}"></span>
+                        <span th:text="${#authorization.expression('hasRole(''ROLE_ADMIN'')') ? 'Администратор' : #authentication.name}"></span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                         <li><a class="dropdown-item" th:href="@{/user/profile}">Профиль</a></li>

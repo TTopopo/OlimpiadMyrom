@@ -40,23 +40,26 @@
                               method="post" class="mt-3">
                             <div class="form-group">
                                 <label>Ваш ответ:</label>
-                                <div th:switch="${task.type}">
-                                    <textarea th:case="'text'" class="form-control" name="answer" rows="3" required></textarea>
-                                    <div th:case="'single'">
-                                        <div th:each="opt,idx : ${task.options}">
+                                <div th:switch="${task.taskType.name()}">
+                                    <textarea th:case="'TEXT_ANSWER'" class="form-control" name="answer" rows="3" required></textarea>
+                                    <div th:case="'SINGLE_CHOICE'">
+                                        <div th:each="opt,idx : ${task.optionsList}">
                                             <div class="form-check">
                                                 <input class="form-check-input" type="radio" name="answer" th:id="'opt-'+${task.id}+'-'+${idx.index}" th:value="${opt}" required>
                                                 <label class="form-check-label" th:for="'opt-'+${task.id}+'-'+${idx.index}" th:text="${opt}"></label>
                                             </div>
                                         </div>
                                     </div>
-                                    <div th:case="'multiple'">
-                                        <div th:each="opt,idx : ${task.options}">
+                                    <div th:case="'MULTIPLE_CHOICE'">
+                                        <div th:each="opt,idx : ${task.optionsList}">
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" name="answer" th:id="'opt-'+${task.id}+'-'+${idx.index}" th:value="${opt}">
                                                 <label class="form-check-label" th:for="'opt-'+${task.id}+'-'+${idx.index}" th:text="${opt}"></label>
                                             </div>
                                         </div>
+                                    </div>
+                                    <div th:case="'CODE_ANSWER'">
+                                        <textarea class="form-control" name="answer" rows="5" placeholder="Введите код"></textarea>
                                     </div>
                                 </div>
                             </div>

@@ -41,6 +41,9 @@ public class User implements UserDetails {
     @Column(name = "course_number", nullable = false)
     private Integer courseNumber;
 
+    @Column(name = "nickname", nullable = false)
+    private String nickname;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserAnswer> answers;
 
@@ -144,5 +147,13 @@ public class User implements UserDetails {
 
     public void setCourseNumber(Integer courseNumber) {
         this.courseNumber = courseNumber;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 } 

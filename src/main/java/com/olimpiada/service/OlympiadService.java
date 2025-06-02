@@ -3,7 +3,9 @@ package com.olimpiada.service;
 import com.olimpiada.entity.CourseType;
 import com.olimpiada.entity.Olympiad;
 import com.olimpiada.repository.OlympiadRepository;
+import com.olimpiada.repository.ParticipationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,6 +17,9 @@ public class OlympiadService {
     
     @Autowired
     private OlympiadRepository olympiadRepository;
+    
+    @Autowired
+    private ParticipationRepository participationRepository;
     
     public List<Olympiad> findAll() {
         return olympiadRepository.findAll();
@@ -66,6 +71,7 @@ public class OlympiadService {
         return olympiadRepository.findByStatus(com.olimpiada.entity.OlympiadStatus.ACTIVE);
     }
     
+    @Scheduled(cron = "0 * * * * *") // каждую минуту
     public void updateOlympiadStatuses() {
         List<Olympiad> olympiads = olympiadRepository.findAll();
         LocalDateTime now = LocalDateTime.now();
@@ -87,5 +93,9 @@ public class OlympiadService {
                     // ничего не делаем для DRAFT, FINISHED, CANCELLED
             }
         }
+    }
+    
+    public boolean isUserRegisteredForOlympiad(Long userId, Long olympiadId) {
+        return participationRepository.findByUserIdAndOlympiadId(userId, olympiadId).isPresent();
     }
 } 

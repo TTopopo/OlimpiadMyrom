@@ -2,7 +2,8 @@ package com.olimpiada.entity;
 
 public enum CourseType {
     BACHELOR("Бакалавриат"),
-    MASTER("Магистратура");
+    MASTER("Магистратура"),
+    SPO("СПО");
 
     private final String displayName;
 

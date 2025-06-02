@@ -10,17 +10,38 @@
         html, body { height: 100%; }
         body { min-height: 100vh; display: flex; flex-direction: column; }
         .main-content { flex: 1 0 auto; }
-        footer { flex-shrink: 0; background: #212529; color: #fff; border-top: 1px solid #343a40; text-align: center; padding: 12px 0 10px 0; font-size: 1rem; width: 100%; position: static; margin-top: 0; }
+        .navbar {
+            min-height: 70px !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        .navbar .container { padding-left: 0; padding-right: 0; }
         .hero-section {
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: white;
-            padding: 100px 0;
+            padding: 48px 0 32px 0;
         }
         .feature-card {
             transition: transform 0.3s;
         }
         .feature-card:hover {
             transform: translateY(-10px);
+        }
+        footer {
+            flex-shrink: 0;
+            background: #212529;
+            color: #fff;
+            border-top: 1px solid #343a40;
+            text-align: center;
+            padding: 0;
+            font-size: 1.1rem;
+            width: 100%;
+            position: static;
+            margin-top: 0;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
@@ -37,7 +58,7 @@
                         <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
                             <a class="nav-link" th:href="@{/user/profile}">
                                 <i class="bi bi-person-circle"></i>
-                                <span th:text="${#authorization.expression('hasRole(''ADMIN'')') ? 'Администратор' : (#authentication.principal.fullName != null ? #authentication.principal.fullName : #authentication.name)}"></span>
+                                <span th:text="${#authorization.expression('hasRole(''ROLE_ADMIN'')') ? 'Администратор' : #authentication.name}"></span>
                             </a>
                         </li>
                         <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
@@ -58,16 +79,16 @@
             <div class="container text-center">
                 <h1 class="display-4 mb-4">Добро пожаловать на платформу олимпиад</h1>
                 <p class="lead mb-5">Участвуйте в олимпиадах, развивайте свои навыки и достигайте новых высот!</p>
-                <th:block th:if="${!#authorization.expression('hasRole(''ADMIN'')')}">
+                <th:block th:if="${!#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
                     <a th:href="@{/olympiads}" class="btn btn-light btn-lg">Начать участие</a>
                 </th:block>
-                <th:block th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                <th:block th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
                     <a th:href="@{/admin/olympiads}" class="btn btn-light btn-lg">Управление олимпиадами</a>
                 </th:block>
             </div>
         </section>
 
-        <section class="py-5">
+        <section class="py-5" style="padding-top:2rem!important;padding-bottom:2rem!important;">
             <div class="container">
                 <h2 class="text-center mb-5">Преимущества нашей платформы</h2>
                 <div class="row">
@@ -98,6 +119,69 @@
                 </div>
             </div>
         </section>
+
+        <div class="container text-center mt-4 mb-5">
+            <th:block th:unless="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <button id="feedbackBtn" class="btn btn-lg btn-primary" style="box-shadow:0 2px 8px rgba(99,102,241,0.12);">
+                    <i class="bi bi-chat-dots me-2"></i>Связаться с администратором
+                </button>
+            </th:block>
+        </div>
+        <!-- Модальное окно обратной связи -->
+        <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="feedbackModalLabel">Связь с администратором</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+              </div>
+              <form id="feedbackForm">
+              <div class="modal-body">
+                <div class="mb-3">
+                  <label for="fbName" class="form-label">Имя</label>
+                  <input type="text" class="form-control" id="fbName" required placeholder="Ваше имя">
+                </div>
+                <div class="mb-3">
+                  <label for="fbEmail" class="form-label">E-mail</label>
+                  <input type="email" class="form-control" id="fbEmail" required placeholder="Ваш email для ответа">
+                </div>
+                <div class="mb-3">
+                  <label for="fbRole" class="form-label">Кто обращается</label>
+                  <select class="form-select" id="fbRole" required>
+                    <option value="Студент">Студент</option>
+                    <option value="Преподаватель">Преподаватель</option>
+                    <option value="Гость">Гость</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="fbTopic" class="form-label">Тема обращения</label>
+                  <select class="form-select" id="fbTopic" required>
+                    <option value="Вопрос по олимпиаде">Вопрос по олимпиаде</option>
+                    <option value="Техническая проблема">Техническая проблема</option>
+                    <option value="Другое">Другое</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="fbMsg" class="form-label">Текст сообщения</label>
+                  <textarea class="form-control" id="fbMsg" rows="3" required placeholder="Опишите ваш вопрос или проблему"></textarea>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="fbAgree" required>
+                  <label class="form-check-label" for="fbAgree">
+                    Я согласен с <a href="#" target="_blank">политикой обработки персональных данных</a>
+                  </label>
+                </div>
+                <div id="fbSuccess" class="alert alert-success d-none mt-2">Спасибо! Ваше сообщение отправлено.</div>
+                <div id="fbError" class="alert alert-danger d-none mt-2">Ошибка отправки. Попробуйте позже.</div>
+                <div class="text-muted mt-3" style="font-size:0.95rem;">Обычно мы отвечаем в течение дня.<br>Ответ придет на почту.</div>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Отправить</button>
+              </div>
+              </form>
+            </div>
+          </div>
+        </div>
     </div>
     <footer class="bg-dark text-white py-4">
         <div class="container text-center">
@@ -105,6 +189,156 @@
         </div>
     </footer>
 
+    <!-- Глобальный объект пользователя -->
+    <script>
+    window.currentUser = {
+      isAuthenticated: /*[[${#authorization.expression('isAuthenticated()')}]]*/ false,
+      name: '/*[[${#authentication.principal.fullName}]]*/',
+      email: '/*[[${#authentication.principal.username}]]*/'
+    };
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    // --- Форма обратной связи ---
+    document.addEventListener('DOMContentLoaded', function() {
+        const feedbackBtn = document.getElementById('feedbackBtn');
+        const feedbackModal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+        const feedbackForm = document.getElementById('feedbackForm');
+        const fbSuccess = document.getElementById('fbSuccess');
+        const fbError = document.getElementById('fbError');
+        const fbName = document.getElementById('fbName');
+        const fbEmail = document.getElementById('fbEmail');
+        const fbRole = document.getElementById('fbRole');
+        // Открытие формы связи с автозаполнением
+        if (feedbackBtn) {
+          feedbackBtn.onclick = function() {
+            if (window.currentUser && window.currentUser.isAuthenticated) {
+              fbName.value = window.currentUser.name;
+              fbEmail.value = window.currentUser.email;
+              fbName.readOnly = true;
+              fbEmail.readOnly = true;
+              fbRole.value = 'Студент';
+              fbRole.closest('.mb-3').style.display = 'none';
+            } else {
+              fbName.value = '';
+              fbEmail.value = '';
+              fbName.readOnly = false;
+              fbEmail.readOnly = false;
+              fbRole.closest('.mb-3').style.display = '';
+            }
+            feedbackModal.show();
+            fbSuccess.classList.add('d-none');
+            fbError.classList.add('d-none');
+            feedbackForm.reset();
+          };
+        }
+        feedbackForm.onsubmit = function(e) {
+            e.preventDefault();
+            fbSuccess.classList.add('d-none');
+            fbError.classList.add('d-none');
+            const data = {
+                name: fbName.value,
+                email: fbEmail.value,
+                role: fbRole.value,
+                topic: document.getElementById('fbTopic').value,
+                message: document.getElementById('fbMsg').value
+            };
+            fetch('/api/feedback', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            }).then(r => {
+                if (r.ok) {
+                    fbSuccess.classList.remove('d-none');
+                    feedbackForm.reset();
+                } else {
+                    fbError.classList.remove('d-none');
+                }
+            }).catch(() => {
+                fbError.classList.remove('d-none');
+            });
+        };
+        // Открытие формы связи из helpModal с автозакрытием helpModal
+        var btn = document.getElementById('feedbackBtnHelpModal');
+        if (btn) {
+          btn.onclick = function() {
+            var helpModalEl = document.getElementById('helpModal');
+            var helpModal = bootstrap.Modal.getInstance(helpModalEl);
+            if (helpModal) helpModal.hide();
+            setTimeout(function() {
+              if (window.currentUser && window.currentUser.isAuthenticated) {
+                fbName.value = window.currentUser.name;
+                fbEmail.value = window.currentUser.email;
+                fbName.readOnly = true;
+                fbEmail.readOnly = true;
+                fbRole.value = 'Студент';
+                fbRole.closest('.mb-3').style.display = 'none';
+              } else {
+                fbName.value = '';
+                fbEmail.value = '';
+                fbName.readOnly = false;
+                fbEmail.readOnly = false;
+                fbRole.closest('.mb-3').style.display = '';
+              }
+              feedbackModal.show();
+              fbSuccess.classList.add('d-none');
+              fbError.classList.add('d-none');
+              feedbackForm.reset();
+            }, 350); // ждём анимацию закрытия helpModal
+          };
+        }
+    });
+    </script>
+
+    <!-- Кнопка 'Помощь?' -->
+    <button class="help-btn" id="helpBtn" title="Помощь" style="position:fixed;bottom:24px;right:32px;z-index:9999;width:56px;height:56px;border-radius:50%;background:#10b981;color:#fff;border:none;box-shadow:0 2px 8px rgba(16,185,129,0.12);font-size:1.5rem;display:flex;align-items:center;justify-content:center;">
+        <i class="bi bi-question-lg"></i>
+    </button>
+    <!-- Модальное окно помощи -->
+    <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="helpModalLabel">Помощь по платформе</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+          </div>
+          <div class="modal-body">
+            <div th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <b>Вы администратор.</b><br>
+                • Управляйте олимпиадами, заданиями и результатами.<br>
+                • Используйте меню для перехода между разделами.<br>
+            </div>
+            <div th:if="${#authorization.expression('isAuthenticated()') and !#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <b>Вы авторизованный пользователь.</b><br>
+                • Участвуйте в доступных олимпиадах.<br>
+                • Просматривайте свои результаты и рейтинг.<br>
+                <button class="btn btn-primary mt-3 w-100" id="feedbackBtnHelpModal"><i class="bi bi-chat-dots me-2"></i>Связаться с администратором</button>
+            </div>
+            <div th:unless="${#authorization.expression('isAuthenticated()')}">
+                <b>Вы гость.</b><br>
+                • Просматривайте информацию о олимпиадах.<br>
+                • Для участия войдите или зарегистрируйтесь.<br>
+                <button class="btn btn-primary mt-3 w-100" id="feedbackBtnHelpModal"><i class="bi bi-chat-dots me-2"></i>Связаться с администратором</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+        document.getElementById('helpBtn').onclick = function() {
+            var modal = new bootstrap.Modal(document.getElementById('helpModal'));
+            modal.show();
+        };
+        document.addEventListener('DOMContentLoaded', function() {
+            var btn = document.getElementById('feedbackBtnHelpModal');
+            if (btn) {
+                btn.onclick = function() {
+                    var feedbackModal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+                    feedbackModal.show();
+                };
+            }
+        });
+    </script>
 </body>
 </html> 

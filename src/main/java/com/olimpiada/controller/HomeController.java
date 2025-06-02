@@ -11,9 +11,15 @@ import com.olimpiada.service.OlympiadService;
 import com.olimpiada.entity.Olympiad;
 import com.olimpiada.service.TaskService;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class HomeController {
+
+    private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 
     @Autowired
     private OlympiadService olympiadService;
@@ -38,29 +44,33 @@ public class HomeController {
     }
 
     @GetMapping("/olympiads")
-    public String listOlympiads(Model model) {
+    public String listOlympiads(Model model, @RequestParam(value = "success", required = false) String success, @RequestParam(value = "error", required = false) String error, Authentication authentication) {
+        if (authentication != null && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+            return "redirect:/admin?error=admin_forbidden";
+        }
         model.addAttribute("title", "Олимпиады");
         model.addAttribute("activeOlympiads", olympiadService.findActiveOlympiads());
         model.addAttribute("upcomingOlympiads", olympiadService.findUpcomingOlympiads(java.time.LocalDateTime.now()));
         model.addAttribute("pastOlympiads", olympiadService.findPastOlympiads(java.time.LocalDateTime.now()));
+        if (success != null && !success.isEmpty()) model.addAttribute("success", success);
+        if (error != null && !error.isEmpty()) model.addAttribute("error", error);
         return "olympiads/list";
     }
 
     @GetMapping("/olympiads/{id}")
     public String viewOlympiad(@PathVariable Long id, Model model, Authentication authentication) {
+        if (authentication != null && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+            return "redirect:/admin?error=admin_forbidden";
+        }
+        String userInfo = (authentication == null) ? "Гость" : authentication.getName();
+        logger.info("[Просмотр олимпиады] id={}, пользователь={}", id, userInfo);
         Olympiad olympiad = olympiadService.findById(id);
         if (olympiad.getEndDate().isBefore(LocalDateTime.now())) {
             return "redirect:/olympiads";
         }
-        
         model.addAttribute("olympiad", olympiad);
         model.addAttribute("tasks", taskService.getTasksByOlympiadId(id));
-        
-        if (authentication != null && authentication.isAuthenticated()) {
-            return "user/olympiad/view";
-        } else {
-            return "olympiads/view";
-        }
+        return "olympiads/view";
     }
 
     @GetMapping("/results")
@@ -77,10 +87,10 @@ public class HomeController {
         return "rating";
     }
 
-    @GetMapping("/admin")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String admin(Model model) {
-        model.addAttribute("title", "Панель администратора");
-        return "admin";
-    }
+//    @GetMapping("/admin")
+//    @PreAuthorize("hasRole('ADMIN')")
+//    public String admin(Model model) {
+//        model.addAttribute("title", "Панель администратора");
+//        return "admin";
+//    }
 } 

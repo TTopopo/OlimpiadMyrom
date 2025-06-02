@@ -43,7 +43,7 @@ public class ResultController {
         List<Result> results = resultRepository.findByOlympiadId(olympiadId);
         model.addAttribute("results", results);
         model.addAttribute("olympiadId", olympiadId);
-        return "results/list";
+        return "results/olympiad";
     }
 
     @GetMapping("/user")

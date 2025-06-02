@@ -3,13 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <title>Результаты олимпиады</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
         html, body { height: 100%; }
         body { min-height: 100vh; display: flex; flex-direction: column; }
         .main-content { flex: 1 0 auto; }
         .navbar.bg-dark, footer.bg-dark { background: #212529 !important; }
         footer.bg-dark { flex-shrink: 0; }
+        .help-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 32px;
+            z-index: 9999;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #10b981;
+            color: #fff;
+            border: none;
+            box-shadow: 0 2px 8px rgba(16,185,129,0.12);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
@@ -42,17 +60,11 @@
         </div>
     </nav>
     <div class="container mt-4">
-        <a href="javascript:history.back()" class="btn btn-outline-secondary mb-3">
+        <a href="javascript:history.back()" class="btn btn-outline-secondary mb-3" style="font-size:1.08rem;padding:0.5rem 1.2rem;">
             <i class="bi bi-arrow-left"></i> Назад
         </a>
         <h2>Результаты олимпиады</h2>
-        
-        <div class="mb-3">
-            <a th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
-               th:href="@{/api/results/olympiad/{id}/calculate(id=${olympiadId})}"
-               class="btn btn-primary">Рассчитать результаты</a>
-        </div>
-
+        <div class="mb-3"></div>
         <div class="table-responsive">
             <table class="table table-striped">
                 <thead>
@@ -65,29 +77,46 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:if="${results == null or results.isEmpty()}">
+                    <tr>
                         <td colspan="5" class="text-center text-muted">Нет участников или результатов для этой олимпиады</td>
-                    </tr>
-                    <tr th:each="result : ${results}">
-                        <td th:text="${result.place}"></td>
-                        <td th:text="${result.user.fullName}"></td>
-                        <td th:text="${result.totalScore}"></td>
-                        <td th:text="${result.status}"></td>
-                        <td th:text="${#temporals.format(result.submissionDate, 'dd.MM.yyyy HH:mm')}"></td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
     </div>
+    <button class="help-btn" id="helpBtn" title="Помощь">
+        <i class="bi bi-question-lg"></i>
+    </button>
+    <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="helpModalLabel">Помощь по результатам олимпиады</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+          </div>
+          <div class="modal-body">
+            <div>
+                <b>Вы авторизованный пользователь.</b><br>
+                • Здесь отображаются результаты выбранной олимпиады.<br>
+                • Если участников нет — таблица будет пустой.<br>
+                • Для возврата используйте кнопку "Назад".<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <footer class="footer bg-dark text-white py-4" style="flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#212529 !important;min-height:70px;">
         <div class="container text-center">
             <p>&copy; 2025 Олимпиады Муромского Института ВлГУ. Все права защищены.</p>
         </div>
     </footer>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('helpBtn').onclick = function() {
+            var modal = new bootstrap.Modal(document.getElementById('helpModal'));
+            modal.show();
+        };
+    </script>
 </body>
 </html> 

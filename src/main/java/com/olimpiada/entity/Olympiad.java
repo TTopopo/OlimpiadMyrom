@@ -35,10 +35,10 @@ public class Olympiad {
     private OlympiadStatus status = OlympiadStatus.DRAFT;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private CourseType educationLevel;
+    @Column(name = "education_level", nullable = false)
+    private EducationLevel educationLevel;
 
-    @Column(nullable = false)
+    @Column(name = "course_number", nullable = false)
     private Integer courseNumber;
 
     @Column(name = "image_path")
@@ -136,11 +136,11 @@ public class Olympiad {
         this.status = status;
     }
 
-    public CourseType getEducationLevel() {
+    public EducationLevel getEducationLevel() {
         return educationLevel;
     }
 
-    public void setEducationLevel(CourseType educationLevel) {
+    public void setEducationLevel(EducationLevel educationLevel) {
         this.educationLevel = educationLevel;
     }
 

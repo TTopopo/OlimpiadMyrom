@@ -43,7 +43,9 @@
                     <div class="card-body p-4">
                         <a href="/" class="btn btn-primary mb-3">МИ ВлГУ</a>
                         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
-                        <form th:action="@{/register}" method="post">
+                        <div id="email-exists-error" class="alert alert-danger" style="display:none;"></div>
+                        <div id="password-error" class="alert alert-danger" style="display:none;"></div>
+                        <form th:action="@{/register}" method="post" id="registerForm">
                             <div class="mb-3">
                                 <label for="fullName" class="form-label">ФИО</label>
                                 <input type="text" class="form-control" id="fullName" name="fullName" required>
@@ -61,6 +63,7 @@
                                 <select class="form-control" id="educationLevel" name="educationLevel" required onchange="updateCourseOptions()">
                                     <option value="BACHELOR">Бакалавриат</option>
                                     <option value="MASTER">Магистратура</option>
+                                    <option value="SPO">СПО</option>
                                 </select>
                             </div>
                             <div class="mb-3">
@@ -75,6 +78,7 @@
                             <div class="mb-3">
                                 <label for="password" class="form-label">Пароль</label>
                                 <input type="password" class="form-control" id="password" name="password" required>
+                                <div id="password-error" class="alert alert-danger mt-2" style="display:none;"></div>
                             </div>
                             <div class="mb-3">
                                 <label for="confirmPassword" class="form-label">Подтверждение пароля</label>
@@ -111,6 +115,13 @@
                     option.textContent = i + ' курс';
                     courseSelect.appendChild(option);
                 }
+            } else if (educationLevel === 'SPO') {
+                for (let i = 1; i <= 4; i++) {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.textContent = i + ' курс';
+                    courseSelect.appendChild(option);
+                }
             } else {
                 for (let i = 1; i <= 2; i++) {
                     const option = document.createElement('option');
@@ -123,19 +134,60 @@
         document.getElementById('educationLevel').addEventListener('change', updateCourseOptions);
         document.addEventListener('DOMContentLoaded', updateCourseOptions);
 
-        document.querySelector('form').addEventListener('submit', function(e) {
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            const fullName = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const birthDate = document.getElementById('birthDate').value;
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
-            const email = document.getElementById('email').value;
             const emailPattern = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+            if (!fullName || !email || !birthDate || !password || !confirmPassword) {
+                alert('Заполните все поля!');
+                e.preventDefault();
+                return;
+            }
             if (!emailPattern.test(email)) {
                 alert('Введите корректный email!');
+                e.preventDefault();
+                return;
+            }
+            const passwordErrorDiv = document.getElementById('password-error');
+            passwordErrorDiv.style.display = 'none';
+            if (password.length < 6) {
+                passwordErrorDiv.textContent = 'Пароль должен быть не менее 6 символов!';
+                passwordErrorDiv.style.display = '';
                 e.preventDefault();
                 return;
             }
             if (password !== confirmPassword) {
                 alert('Пароли не совпадают!');
                 e.preventDefault();
+                return;
+            }
+            // Проверка email на сервере
+            const emailErrorDiv = document.getElementById('email-exists-error');
+            emailErrorDiv.style.display = 'none';
+            const resp = await fetch(`/api/check-email?email=${encodeURIComponent(email)}`);
+            if (resp.ok) {
+                const data = await resp.json();
+                if (data.exists) {
+                    emailErrorDiv.textContent = 'Пользователь с таким email уже зарегистрирован!';
+                    emailErrorDiv.style.display = '';
+                    e.preventDefault();
+                    return;
+                }
+            }
+        });
+
+        // Показываем Bootstrap-оповещение, если есть error в URL
+        document.addEventListener('DOMContentLoaded', function() {
+            const params = new URLSearchParams(window.location.search);
+            const error = params.get('error');
+            if (error) {
+                const emailErrorDiv = document.getElementById('email-exists-error');
+                emailErrorDiv.textContent = decodeURIComponent(error.replace(/\+/g, ' '));
+                emailErrorDiv.style.display = '';
+                window.history.replaceState({}, document.title, window.location.pathname);
             }
         });
     </script>

@@ -57,4 +57,10 @@ public class UserService {
     public List<User> searchUsers(String search) {
         return userRepository.findByFullNameContainingIgnoreCaseOrEmailContainingIgnoreCase(search, search);
     }
+    
+    public void updateNickname(Long id, String nickname) {
+        User user = findById(id);
+        user.setNickname(nickname);
+        userRepository.save(user);
+    }
 } 

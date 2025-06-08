@@ -67,7 +67,7 @@
             </div>
             <div class="mb-3">
                 <label for="age" class="form-label">Возраст участников</label>
-                <input type="number" class="form-control" id="age" name="age" th:value="${olympiad.age}" required min="17">
+                <input type="number" class="form-control" id="age" name="age" th:value="${olympiad.age}" required min="15" placeholder="Минимум 15">
             </div>
             <div class="mb-3">
                 <label for="startDate" class="form-label">Дата начала</label>
@@ -82,9 +82,9 @@
             <div class="mb-3">
                 <label for="educationLevel" class="form-label">Уровень образования</label>
                 <select class="form-control" id="educationLevel" name="educationLevel" required onchange="updateCourseNumberOptions()">
-                    <option th:value="'BACHELOR'" th:selected="${olympiad.educationLevel == 'BACHELOR'}">Бакалавриат</option>
-                    <option th:value="'MASTER'" th:selected="${olympiad.educationLevel == 'MASTER'}">Магистратура</option>
-                    <option th:value="'SPO'" th:selected="${olympiad.educationLevel == 'SPO'}">СПО</option>
+                    <option th:value="'BACHELOR'" th:selected="${olympiad.educationLevel?.name() == 'BACHELOR'}">Бакалавриат</option>
+                    <option th:value="'MASTER'" th:selected="${olympiad.educationLevel?.name() == 'MASTER'}">Магистратура</option>
+                    <option th:value="'SPO'" th:selected="${olympiad.educationLevel?.name() == 'SPO'}">СПО</option>
                 </select>
             </div>
             <div class="mb-3">
@@ -161,9 +161,9 @@ function updateCourseNumberOptions() {
         minAge = 15;
     }
     ageInput.min = minAge;
-    // Если текущее значение меньше min, сбросить
+    ageInput.placeholder = 'Минимум ' + minAge;
     if (ageInput.value && parseInt(ageInput.value) < minAge) {
-        ageInput.value = minAge;
+        ageInput.value = '';
     }
     for (let i = 1; i <= max; i++) {
         const option = document.createElement('option');
@@ -171,7 +171,6 @@ function updateCourseNumberOptions() {
         option.textContent = i + ' курс';
         courseNumber.appendChild(option);
     }
-    // Если есть значение из data-selected, выделить его
     const selected = courseNumber.getAttribute('data-selected');
     if (selected && selected >= 1 && selected <= max) {
         courseNumber.value = selected;
@@ -300,6 +299,8 @@ document.getElementById('helpBtn').onclick = function() {
     var modal = new bootstrap.Modal(document.getElementById('helpModal'));
     modal.show();
 };
+
+alert('userId: ' + userId + ', olympiadId: ' + olympiadId);
 </script>
 </body>
 </html>

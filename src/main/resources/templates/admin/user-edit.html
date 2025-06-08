@@ -51,6 +51,7 @@
             <div class="mb-3">
                 <label class="form-label">Email</label>
                 <input type="email" class="form-control" th:field="*{email}" required>
+                <input type="hidden" name="nickname" th:value="${user.nickname}">
             </div>
             <div class="mb-3">
                 <label class="form-label">Роль</label>
@@ -61,7 +62,7 @@
             </div>
             <div class="mb-3">
                 <label class="form-label">Дата рождения</label>
-                <input type="date" class="form-control" th:field="*{birthDate}" required>
+                <input type="date" class="form-control" name="birthDate" th:value="${user.birthDate != null ? #temporals.format(user.birthDate, 'yyyy-MM-dd') : ''}" required>
                 <div class="form-text">
                     Текущая дата рождения: <span th:text="${#temporals.format(user.birthDate, 'dd.MM.yyyy')}"></span>
                 </div>
@@ -71,6 +72,7 @@
                 <select class="form-control" th:field="*{educationLevel}" required>
                     <option value="BACHELOR" th:selected="${user.educationLevel?.toString() == 'BACHELOR'}">Бакалавриат</option>
                     <option value="MASTER" th:selected="${user.educationLevel?.toString() == 'MASTER'}">Магистратура</option>
+                    <option value="SPO" th:selected="${user.educationLevel?.toString() == 'SPO'}">СПО</option>
                 </select>
             </div>
             <div class="mb-3">

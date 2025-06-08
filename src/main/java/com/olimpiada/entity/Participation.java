@@ -21,6 +21,15 @@ public class Participation {
     @Column(nullable = false)
     private LocalDateTime registrationDate;
 
+    @Column(name = "start_time")
+    private LocalDateTime startTime;
+
+    @Transient
+    private boolean hasAnswers;
+
+    @Column(name = "finished", nullable = false)
+    private boolean finished = false;
+
     public Long getId() {
         return id;
     }
@@ -51,5 +60,29 @@ public class Participation {
 
     public void setRegistrationDate(LocalDateTime registrationDate) {
         this.registrationDate = registrationDate;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public boolean isHasAnswers() {
+        return hasAnswers;
+    }
+
+    public void setHasAnswers(boolean hasAnswers) {
+        this.hasAnswers = hasAnswers;
+    }
+
+    public boolean isFinished() {
+        return finished;
+    }
+
+    public void setFinished(boolean finished) {
+        this.finished = finished;
     }
 } 

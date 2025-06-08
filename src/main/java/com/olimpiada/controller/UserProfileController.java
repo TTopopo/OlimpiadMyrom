@@ -14,6 +14,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
+import com.olimpiada.entity.Participation;
+import com.olimpiada.repository.ParticipationRepository;
+import com.olimpiada.entity.Result;
+import com.olimpiada.service.ResultService;
+import org.springframework.http.ResponseEntity;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 
@@ -27,6 +33,41 @@ public class UserProfileController {
     @Autowired
     private UserAnswerService userAnswerService;
 
+    @Autowired
+    private ParticipationRepository participationRepository;
+
+    @Autowired
+    private ResultService resultService;
+
+    // DTO для истории участия
+    class ParticipationProfileDTO {
+        private Participation participation;
+        private Float totalScore;
+        private Float maxPossibleScore;
+        private Integer place;
+        private String certificatePath;
+        private String gramotaPath;
+        private boolean showDiploma;
+        private Result result;
+        // геттеры/сеттеры
+        public Participation getParticipation() { return participation; }
+        public void setParticipation(Participation participation) { this.participation = participation; }
+        public Float getTotalScore() { return totalScore; }
+        public void setTotalScore(Float totalScore) { this.totalScore = totalScore; }
+        public Float getMaxPossibleScore() { return maxPossibleScore; }
+        public void setMaxPossibleScore(Float maxPossibleScore) { this.maxPossibleScore = maxPossibleScore; }
+        public Integer getPlace() { return place; }
+        public void setPlace(Integer place) { this.place = place; }
+        public String getCertificatePath() { return certificatePath; }
+        public void setCertificatePath(String certificatePath) { this.certificatePath = certificatePath; }
+        public String getGramotaPath() { return gramotaPath; }
+        public void setGramotaPath(String gramotaPath) { this.gramotaPath = gramotaPath; }
+        public boolean isShowDiploma() { return showDiploma; }
+        public void setShowDiploma(boolean showDiploma) { this.showDiploma = showDiploma; }
+        public Result getResult() { return result; }
+        public void setResult(Result result) { this.result = result; }
+    }
+
     @GetMapping("/profile")
     public String profile(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         User user = userService.findByEmail(userDetails.getUsername());
@@ -36,9 +77,35 @@ public class UserProfileController {
             // Для администратора показываем админ-профиль
             return "admin/profile";
         } else {
-            // Для обычного пользователя показываем обычный профиль
-            List<UserAnswer> userAnswers = userAnswerService.findByUserId(user.getId());
-            model.addAttribute("userAnswers", userAnswers);
+            List<Participation> participations = participationRepository.findByUserId(user.getId());
+            List<ParticipationProfileDTO> participationDtos = new java.util.ArrayList<>();
+            for (Participation p : participations) {
+                ParticipationProfileDTO dto = new ParticipationProfileDTO();
+                dto.setParticipation(p);
+                List<Result> results = resultService.findByUserIdAndOlympiadId(user.getId(), p.getOlympiad().getId());
+                if (!results.isEmpty()) {
+                    Result r = results.get(0);
+                    dto.setResult(r);
+                    dto.setTotalScore(r.getTotalScore());
+                    dto.setMaxPossibleScore(r.getMaxPossibleScore());
+                    boolean finished = p.getOlympiad().getStatus() != null && p.getOlympiad().getStatus().name().equals("FINISHED");
+                    if (finished) {
+                        dto.setPlace(r.getPlace());
+                    } else {
+                        dto.setPlace(null);
+                    }
+                    dto.setCertificatePath("/user/olympiad/" + p.getOlympiad().getId() + "/certificate/pdf");
+                    boolean isPrize = r.getPlace() != null && r.getPlace() >= 1 && r.getPlace() <= 3;
+                    dto.setShowDiploma(finished && isPrize);
+                    if (dto.isShowDiploma()) {
+                        dto.setGramotaPath("/user/olympiad/" + p.getOlympiad().getId() + "/diploma/pdf");
+                    } else {
+                        dto.setGramotaPath(null);
+                    }
+                }
+                participationDtos.add(dto);
+            }
+            model.addAttribute("participationDtos", participationDtos);
             return "user/profile";
         }
     }
@@ -51,15 +118,25 @@ public class UserProfileController {
     }
 
     @PostMapping("/profile/edit-nickname")
-    public String updateNickname(@AuthenticationPrincipal UserDetails userDetails, @RequestParam String nickname, Model model) {
+    public ResponseEntity<?> updateNickname(@AuthenticationPrincipal UserDetails userDetails, @RequestParam String nickname, HttpServletRequest request, Model model) {
         User user = userService.findByEmail(userDetails.getUsername());
         if (nickname == null || nickname.trim().isEmpty()) {
-            model.addAttribute("user", user);
-            model.addAttribute("error", "Никнейм не может быть пустым!");
-            return "user/edit-nickname";
+            return ResponseEntity.badRequest().body("Никнейм не может быть пустым!");
         }
-        user.setNickname(nickname.trim());
-        userService.update(user.getId(), user);
-        return "redirect:/user/profile";
+        userService.updateNickname(user.getId(), nickname.trim());
+        // Обновляем Principal в сессии
+        org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(
+            new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                new com.olimpiada.security.CustomUserDetails(userService.findByEmail(user.getEmail())),
+                user.getPassword(),
+                java.util.List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_" + user.getRole()))
+            )
+        );
+        // Если AJAX — просто 200 OK
+        if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+            return ResponseEntity.ok().build();
+        }
+        // Если обычная форма — редирект
+        return ResponseEntity.status(302).header("Location", "/user/profile").build();
     }
 } 

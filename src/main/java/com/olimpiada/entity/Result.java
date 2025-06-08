@@ -24,6 +24,12 @@ public class Result {
     @Column(name = "total_score", nullable = false)
     private Float totalScore;
 
+    @Column(name = "max_possible_score", nullable = false)
+    private Float maxPossibleScore;
+
+    @Column(name = "completion_percentage", nullable = false)
+    private Float completionPercentage;
+
     @Column(name = "submission_date", nullable = false)
     private LocalDateTime submissionDate;
 
@@ -71,6 +77,22 @@ public class Result {
 
     public void setTotalScore(Float totalScore) {
         this.totalScore = totalScore;
+    }
+
+    public Float getMaxPossibleScore() {
+        return maxPossibleScore;
+    }
+
+    public void setMaxPossibleScore(Float maxPossibleScore) {
+        this.maxPossibleScore = maxPossibleScore;
+    }
+
+    public Float getCompletionPercentage() {
+        return completionPercentage;
+    }
+
+    public void setCompletionPercentage(Float completionPercentage) {
+        this.completionPercentage = completionPercentage;
     }
 
     public LocalDateTime getSubmissionDate() {

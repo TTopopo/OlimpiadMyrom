@@ -21,7 +21,7 @@ public class Task {
     private String taskText;
 
     @Column(name = "max_score", nullable = false)
-    private Integer maxScore;
+    private Float maxScore;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "task_type", nullable = false)
@@ -70,11 +70,11 @@ public class Task {
         this.taskText = taskText;
     }
 
-    public Integer getMaxScore() {
+    public Float getMaxScore() {
         return maxScore;
     }
 
-    public void setMaxScore(Integer maxScore) {
+    public void setMaxScore(Float maxScore) {
         this.maxScore = maxScore;
     }
 

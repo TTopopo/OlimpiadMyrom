@@ -2,6 +2,8 @@ package com.olimpiada.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDateTime;
 
@@ -14,7 +16,7 @@ public class UserAnswer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = true, columnDefinition = "TEXT")
     private String answer;
     
     @Column
@@ -28,10 +30,12 @@ public class UserAnswer {
     
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
     
     @ManyToOne
     @JoinColumn(name = "task_id", nullable = false)
+    @JsonBackReference
     private Task task;
 
     public void setUser(User user) {
@@ -80,5 +84,12 @@ public class UserAnswer {
 
     public void setFlagged(boolean flagged) {
         this.flagged = flagged;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (submissionTime == null) {
+            submissionTime = java.time.LocalDateTime.now();
+        }
     }
 } 

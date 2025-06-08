@@ -89,12 +89,14 @@
                     <td>
                         <th:block th:if="${olympiad.endDate.isBefore(T(java.time.LocalDateTime).now())}">
                             <button class="btn btn-secondary" disabled>Завершена</button>
+                            <button type="button" class="btn btn-danger ms-2" th:attr="data-id=${olympiad.id}"
+                                    onclick="showDeleteOlympiadModal(this.getAttribute('data-id'))">
+                                Удалить
+                            </button>
                         </th:block>
                         <th:block th:unless="${olympiad.endDate.isBefore(T(java.time.LocalDateTime).now())}">
                             <a th:href="@{/admin/olympiads/edit/{id}(id=${olympiad.id})}" class="btn btn-warning">Редактировать</a>
                             <button type="button" class="btn btn-danger" th:attr="data-id=${olympiad.id}"
-                                    th:disabled="${olympiad.status.name() == 'ACTIVE'}"
-                                    th:classappend="${olympiad.status.name() == 'ACTIVE'} ? ' disabled btn-secondary' : ''"
                                     onclick="showDeleteOlympiadModal(this.getAttribute('data-id'))">
                                 Удалить
                             </button>

@@ -18,7 +18,8 @@ CREATE TABLE olympiads (
     end_date TIMESTAMP NOT NULL,
     status VARCHAR(20) NOT NULL,
     age INTEGER,
-    course VARCHAR(20)
+    education_level VARCHAR(20) NOT NULL DEFAULT 'BACHELOR',
+    course_number INTEGER NOT NULL DEFAULT 1
 );
 
 

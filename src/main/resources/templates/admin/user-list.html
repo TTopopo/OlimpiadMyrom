@@ -68,7 +68,7 @@
                     <td th:text="${user.email}"></td>
                     <td th:text="${user.role == 'ADMIN' ? 'Администратор' : (user.role == 'USER' ? 'Пользователь' : (user.role != null ? user.role : '-'))}"></td>
                     <td th:text="${#temporals.format(user.birthDate, 'dd.MM.yyyy')}"></td>
-                    <td th:text="${user.educationLevel?.toString() == 'BACHELOR' ? 'Бакалавриат' : (user.educationLevel?.toString() == 'MASTER' ? 'Магистратура' : '-')}"/>
+                    <td th:text="${user.educationLevel?.toString() == 'BACHELOR' ? 'Бакалавриат' : (user.educationLevel?.toString() == 'MASTER' ? 'Магистратура' : (user.educationLevel?.toString() == 'SPO' ? 'СПО' : '-'))}"/>
                     <td th:text="${user.courseNumber != null ? user.courseNumber + ' курс' : '-'}"/>
                     <td>********</td>
                     <td>

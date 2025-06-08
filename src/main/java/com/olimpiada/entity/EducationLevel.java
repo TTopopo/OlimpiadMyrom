@@ -2,7 +2,8 @@ package com.olimpiada.entity;
 
 public enum EducationLevel {
     BACHELOR("Бакалавриат"),
-    MASTER("Магистратура");
+    MASTER("Магистратура"),
+    SPO("СПО");
 
     private final String displayName;
 

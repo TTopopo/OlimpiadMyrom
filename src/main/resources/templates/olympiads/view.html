@@ -138,6 +138,17 @@
     </style>
 </head>
 <body>
+<!-- Toast уведомление -->
+<div aria-live="polite" aria-atomic="true" style="position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%); min-width: 320px; max-width: 900px; width: 100vw; z-index: 9999; font-size: 1.1rem; font-weight: 500; display: flex; justify-content: center;">
+    <div class="toast align-items-center text-bg-success border-0" id="registerToast" role="alert" aria-live="assertive" aria-atomic="true" style="box-shadow:0 2px 16px rgba(16,185,129,0.18); min-height: 60px; font-size: 1.25em; font-weight: 600; white-space:nowrap; border-radius:0; width:100%; display:none; padding: 1.1rem 1.5rem;">
+        <div class="d-flex">
+            <div class="toast-body" id="registerToastBody">
+                <i class="bi bi-check-circle-fill me-2" style="font-size:1.5em;"></i><b>Успех!</b> Вы успешно записались на олимпиаду.
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand" href="/">Олимпиады МИ ВлГУ</a>
@@ -256,6 +267,61 @@
     </div>
   </div>
 </div>
+<!-- Модальное окно обратной связи -->
+<div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="feedbackModalLabel">Связь с администратором</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+      </div>
+      <form id="feedbackForm">
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="fbName" class="form-label">Имя</label>
+          <input type="text" class="form-control" id="fbName" required placeholder="Ваше имя">
+        </div>
+        <div class="mb-3">
+          <label for="fbEmail" class="form-label">E-mail</label>
+          <input type="email" class="form-control" id="fbEmail" required placeholder="Ваш email для ответа">
+        </div>
+        <div class="mb-3">
+          <label for="fbRole" class="form-label">Кто обращается</label>
+          <select class="form-select" id="fbRole" required>
+            <option value="Студент">Студент</option>
+            <option value="Преподаватель">Преподаватель</option>
+            <option value="Гость">Гость</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="fbTopic" class="form-label">Тема обращения</label>
+          <select class="form-select" id="fbTopic" required>
+            <option value="Вопрос по олимпиаде">Вопрос по олимпиаде</option>
+            <option value="Техническая проблема">Техническая проблема</option>
+            <option value="Другое">Другое</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="fbMsg" class="form-label">Текст сообщения</label>
+          <textarea class="form-control" id="fbMsg" rows="3" required placeholder="Опишите ваш вопрос или проблему"></textarea>
+        </div>
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox" id="fbAgree" required>
+          <label class="form-check-label" for="fbAgree">
+            Я согласен с <a href="#" target="_blank">политикой обработки персональных данных</a>
+          </label>
+        </div>
+        <div id="fbSuccess" class="alert alert-success d-none mt-2">Спасибо! Ваше сообщение отправлено.</div>
+        <div id="fbError" class="alert alert-danger d-none mt-2">Ошибка отправки. Попробуйте позже.</div>
+        <div class="text-muted mt-3" style="font-size:0.95rem;">Обычно мы отвечаем в течение дня.<br>Ответ придет на почту.</div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Отправить</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
 <footer class="bg-dark text-white py-4" style="min-height:70px;display:flex;align-items:center;justify-content:center;">
     <div class="container text-center">
         <p>&copy; 2025 Олимпиады Муромского Института ВлГУ. Все права защищены.</p>
@@ -274,6 +340,21 @@
                 var feedbackModal = new bootstrap.Modal(document.getElementById('feedbackModal'));
                 feedbackModal.show();
             };
+        }
+        // Показываем toast при успешной регистрации
+        function getUrlParam(name) {
+            const url = new URL(window.location.href);
+            return url.searchParams.get(name);
+        }
+        if (getUrlParam('success') === 'registered') {
+            var toastEl = document.getElementById('registerToast');
+            var toastBody = document.getElementById('registerToastBody');
+            if (toastBody) {
+                toastBody.innerHTML = 'Вы успешно записались на олимпиаду!';
+            }
+            toastEl.style.display = '';
+            var toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+            toast.show();
         }
     });
 </script>

@@ -47,6 +47,12 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserAnswer> answers;
 
+    @Column(name = "reset_password_token")
+    private String resetPasswordToken;
+
+    @Column(name = "reset_password_token_expiry")
+    private java.time.LocalDateTime resetPasswordTokenExpiry;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
@@ -155,5 +161,21 @@ public class User implements UserDetails {
 
     public void setNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public String getResetPasswordToken() {
+        return resetPasswordToken;
+    }
+
+    public void setResetPasswordToken(String token) {
+        this.resetPasswordToken = token;
+    }
+
+    public java.time.LocalDateTime getResetPasswordTokenExpiry() {
+        return resetPasswordTokenExpiry;
+    }
+
+    public void setResetPasswordTokenExpiry(java.time.LocalDateTime expiry) {
+        this.resetPasswordTokenExpiry = expiry;
     }
 } 

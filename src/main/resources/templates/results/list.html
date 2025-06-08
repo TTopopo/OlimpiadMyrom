@@ -72,7 +72,7 @@
                         <td th:text="${result.place}"></td>
                         <td th:text="${result.user.fullName}"></td>
                         <td th:text="${result.totalScore}"></td>
-                        <td th:text="${result.status}"></td>
+                        <td th:text="${result.status.displayName}"></td>
                         <td th:text="${#temporals.format(result.submissionDate, 'dd.MM.yyyy HH:mm')}"></td>
                     </tr>
                 </tbody>

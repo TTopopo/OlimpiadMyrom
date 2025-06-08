@@ -77,8 +77,15 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
+                    <tr th:if="${results == null or results.isEmpty()}">
                         <td colspan="5" class="text-center text-muted">Нет участников или результатов для этой олимпиады</td>
+                    </tr>
+                    <tr th:each="result : ${results}">
+                        <td th:text="${result.place}"></td>
+                        <td th:text="${result.user.fullName}"></td>
+                        <td th:text="${result.totalScore}"></td>
+                        <td th:text="${result.status.displayName}"></td>
+                        <td th:text="${#temporals.format(result.submissionDate, 'dd.MM.yyyy HH:mm')}"></td>
                     </tr>
                 </tbody>
             </table>

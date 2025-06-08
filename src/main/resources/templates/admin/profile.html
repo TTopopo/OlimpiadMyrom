@@ -135,20 +135,6 @@
                             </div>
                         </div>
 
-                        <!-- Проверка ответов -->
-                        <div class="col-md-6 mb-4">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">
-                                        <i class="bi bi-check-circle"></i>
-                                        Проверка ответов
-                                    </h5>
-                                    <p class="card-text">Проверка и оценка ответов участников олимпиад.</p>
-                                    <a th:href="@{/admin/answers}" class="btn btn-primary">Проверить ответы</a>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- Просмотр профилей пользователей -->
                         <div class="col-md-6 mb-4">
                             <div class="card h-100">
@@ -246,7 +232,6 @@
             if (!reply) return;
             fetch('/api/feedback/reply?id=' + id + '&reply=' + encodeURIComponent(reply), {method:'POST'})
                 .then(() => {
-                    sendReplyEmail(email, reply);
                     renderFeedbackQuestions();
                 });
         };
@@ -255,13 +240,6 @@
         const replyRow = document.getElementById('replyRow_' + id);
         replyRow.style.display = 'none';
         replyRow.firstElementChild.innerHTML = '';
-    }
-    function sendReplyEmail(email, reply) {
-        fetch('/api/feedback/send-email', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({email, reply})
-        });
     }
     </script>
 </body>

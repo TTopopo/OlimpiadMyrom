@@ -1,7 +1,6 @@
 package com.olimpiada.repository;
 
 import com.olimpiada.entity.Olympiad;
-import com.olimpiada.entity.CourseType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

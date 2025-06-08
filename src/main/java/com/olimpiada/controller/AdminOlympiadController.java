@@ -62,7 +62,7 @@ public class AdminOlympiadController {
             olympiad.setName(name);
             olympiad.setDescription(description);
             olympiad.setAge(age);
-            olympiad.setEducationLevel(com.olimpiada.entity.CourseType.valueOf(educationLevel));
+            olympiad.setEducationLevel(com.olimpiada.entity.EducationLevel.valueOf(educationLevel));
             olympiad.setCourseNumber(courseNumber);
             olympiad.setStartDate(start);
             olympiad.setEndDate(end);
@@ -75,7 +75,7 @@ public class AdminOlympiadController {
             olympiad.setName(name);
             olympiad.setDescription(description);
             olympiad.setAge(age);
-            olympiad.setEducationLevel(com.olimpiada.entity.CourseType.valueOf(educationLevel));
+            olympiad.setEducationLevel(com.olimpiada.entity.EducationLevel.valueOf(educationLevel));
             olympiad.setCourseNumber(courseNumber);
             olympiad.setStartDate(start);
             olympiad.setEndDate(end);
@@ -87,7 +87,7 @@ public class AdminOlympiadController {
         olympiad.setName(name);
         olympiad.setDescription(description);
         olympiad.setAge(age);
-        olympiad.setEducationLevel(com.olimpiada.entity.CourseType.valueOf(educationLevel));
+        olympiad.setEducationLevel(com.olimpiada.entity.EducationLevel.valueOf(educationLevel));
         olympiad.setCourseNumber(courseNumber);
         olympiad.setStartDate(start);
         olympiad.setEndDate(end);
@@ -135,9 +135,19 @@ public class AdminOlympiadController {
                                @RequestParam(value = "image", required = false) MultipartFile image,
                                @RequestParam(value = "removeImage", required = false) String removeImage,
                                Model model) {
+        Olympiad olympiad = olympiadService.findById(id);
         String error = validateEducationAndCourse(educationLevel, courseNumber, age);
         if (error != null) {
-            model.addAttribute("olympiad", olympiadService.findById(id));
+            olympiad.setName(name);
+            olympiad.setDescription(description);
+            olympiad.setAge(age);
+            olympiad.setEducationLevel(com.olimpiada.entity.EducationLevel.valueOf(educationLevel));
+            olympiad.setCourseNumber(courseNumber);
+            java.time.LocalDateTime start = java.time.LocalDateTime.parse(startDate);
+            java.time.LocalDateTime end = java.time.LocalDateTime.parse(endDate);
+            olympiad.setStartDate(start);
+            olympiad.setEndDate(end);
+            model.addAttribute("olympiad", olympiad);
             model.addAttribute("error", error);
             return "admin/olympiad-form";
         }
@@ -145,11 +155,10 @@ public class AdminOlympiadController {
         java.time.LocalDateTime end = java.time.LocalDateTime.parse(endDate);
         java.time.LocalDateTime now = java.time.LocalDateTime.now().withSecond(0).withNano(0);
         if (start.isBefore(now)) {
-            Olympiad olympiad = olympiadService.findById(id);
             olympiad.setName(name);
             olympiad.setDescription(description);
             olympiad.setAge(age);
-            olympiad.setEducationLevel(com.olimpiada.entity.CourseType.valueOf(educationLevel));
+            olympiad.setEducationLevel(com.olimpiada.entity.EducationLevel.valueOf(educationLevel));
             olympiad.setCourseNumber(courseNumber);
             olympiad.setStartDate(start);
             olympiad.setEndDate(end);
@@ -158,11 +167,10 @@ public class AdminOlympiadController {
             return "admin/olympiad-form";
         }
         if (end.isBefore(start)) {
-            Olympiad olympiad = olympiadService.findById(id);
             olympiad.setName(name);
             olympiad.setDescription(description);
             olympiad.setAge(age);
-            olympiad.setEducationLevel(com.olimpiada.entity.CourseType.valueOf(educationLevel));
+            olympiad.setEducationLevel(com.olimpiada.entity.EducationLevel.valueOf(educationLevel));
             olympiad.setCourseNumber(courseNumber);
             olympiad.setStartDate(start);
             olympiad.setEndDate(end);
@@ -170,11 +178,10 @@ public class AdminOlympiadController {
             model.addAttribute("error", "Дата окончания не может быть раньше даты начала!");
             return "admin/olympiad-form";
         }
-        Olympiad olympiad = olympiadService.findById(id);
         olympiad.setName(name);
         olympiad.setDescription(description);
         olympiad.setAge(age);
-        olympiad.setEducationLevel(com.olimpiada.entity.CourseType.valueOf(educationLevel));
+        olympiad.setEducationLevel(com.olimpiada.entity.EducationLevel.valueOf(educationLevel));
         olympiad.setCourseNumber(courseNumber);
         olympiad.setStartDate(start);
         olympiad.setEndDate(end);
@@ -183,6 +190,13 @@ public class AdminOlympiadController {
         boolean removeOld = "true".equals(removeImage);
         boolean noNewImage = image == null || image.isEmpty();
         if ((noOldImage || removeOld) && noNewImage) {
+            olympiad.setName(name);
+            olympiad.setDescription(description);
+            olympiad.setAge(age);
+            olympiad.setEducationLevel(com.olimpiada.entity.EducationLevel.valueOf(educationLevel));
+            olympiad.setCourseNumber(courseNumber);
+            olympiad.setStartDate(start);
+            olympiad.setEndDate(end);
             model.addAttribute("olympiad", olympiad);
             model.addAttribute("error", "Пожалуйста, добавьте фото олимпиады!");
             return "admin/olympiad-form";
@@ -211,8 +225,15 @@ public class AdminOlympiadController {
                 olympiad.setImagePath(fileName);
             }
         } catch (Exception e) {
-            model.addAttribute("error", "Ошибка при загрузке/удалении фото: " + e.getMessage());
+            olympiad.setName(name);
+            olympiad.setDescription(description);
+            olympiad.setAge(age);
+            olympiad.setEducationLevel(com.olimpiada.entity.EducationLevel.valueOf(educationLevel));
+            olympiad.setCourseNumber(courseNumber);
+            olympiad.setStartDate(start);
+            olympiad.setEndDate(end);
             model.addAttribute("olympiad", olympiad);
+            model.addAttribute("error", "Ошибка при загрузке/удалении фото: " + e.getMessage());
             return "admin/olympiad-form";
         }
         // --- /Обработка фото ---

@@ -37,7 +37,7 @@ public class FeedbackController {
     @PostMapping("/reply")
     public void replyFeedback(@RequestParam Long id, @RequestParam String reply) {
         FeedbackMessage msg = feedbackMessageRepository.findById(id).orElse(null);
-        if (msg != null) {
+        if (msg != null && msg.getAdminReply() == null) {
             msg.setAdminReply(reply);
             msg.setAdminReplyAt(java.time.LocalDateTime.now());
             feedbackMessageRepository.save(msg);
@@ -49,11 +49,15 @@ public class FeedbackController {
                     helper.setTo(msg.getEmail());
                     helper.setSubject("Ответ на ваш вопрос на платформе олимпиад");
                     StringBuilder text = new StringBuilder();
-                    text.append("Здравствуйте, ").append(msg.getName() != null ? msg.getName() : "пользователь").append("!\n\n");
-                    text.append("Ваш вопрос: ").append(msg.getMessage()).append("\n");
+                    text.append("Здравствуйте, ")
+                        .append(msg.getName() != null ? msg.getName() : "пользователь").append("!\n\n");
+                    text.append("Вы задали вопрос на платформе Олимпиад:\n");
                     if (msg.getTopic() != null) text.append("Тема: ").append(msg.getTopic()).append("\n");
-                    text.append("\nОтвет администратора:\n").append(reply).append("\n\n");
-                    text.append("С уважением, команда Олимпиад.");
+                    text.append("Вопрос: ").append(msg.getMessage()).append("\n\n");
+                    text.append("Ответ администратора:\n").append(reply).append("\n\n");
+                    text.append("Если у вас остались вопросы — пишите нам на support@olimpiada.ru или отвечайте на это письмо.\n\n");
+                    text.append("С уважением, команда Олимпиад.\n");
+                    text.append("https://olimpiada.ru\n");
                     helper.setText(text.toString(), false);
                     helper.setFrom(fromEmail);
                     mailSender.send(message);

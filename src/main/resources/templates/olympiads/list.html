@@ -164,27 +164,51 @@
 
         <div class="container mt-4" style="margin-top: 18px !important; margin-bottom: 18px !important;">
             <!-- Toast уведомления -->
-            <div aria-live="polite" aria-atomic="true" style="position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%); min-width: 520px; max-width: 900px; width: 100vw; z-index: 9999; font-size: 1.1rem; font-weight: 500; display: flex; justify-content: center;">
-                <div class="toast align-items-center text-bg-success border-0" id="registerToast" role="alert" aria-live="assertive" aria-atomic="true" th:if="${success == 'registered'}" style="box-shadow:0 2px 16px rgba(16,185,129,0.18); min-height: 44px; font-size: 1.1em; font-weight: 600; white-space:nowrap; border-radius:0; width:100%;">
+            <div aria-live="polite" aria-atomic="true" style="position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%); min-width: 320px; max-width: 900px; width: 100vw; z-index: 9999; font-size: 1.1rem; font-weight: 500; display: flex; justify-content: center;">
+                <div class="toast align-items-center text-bg-success border-0" id="registerToast" role="alert" aria-live="assertive" aria-atomic="true" style="box-shadow:0 2px 16px rgba(16,185,129,0.18); min-height: 60px; font-size: 1.25em; font-weight: 600; white-space:nowrap; border-radius:0; width:100%; display:none; padding: 1.1rem 1.5rem;">
                     <div class="d-flex">
-                        <div class="toast-body">
-                            <i class="bi bi-check-circle me-2"></i><b>Успех!</b> Вы записались на олимпиаду.
+                        <div class="toast-body" id="registerToastBody">
+                            <i class="bi bi-check2-circle me-2" style="font-size:1.7em;color:#fff;"></i><b>Успех!</b> Вы успешно записались на олимпиаду.
                         </div>
                         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                     </div>
                 </div>
-                <div class="toast align-items-center text-bg-warning border-0" id="alreadyRegisteredToast" role="alert" aria-live="assertive" aria-atomic="true" th:if="${error == 'already_registered'}" style="box-shadow:0 2px 16px rgba(251,191,36,0.18); min-height: 44px; font-size: 1.1em; font-weight: 600; white-space:nowrap; border-radius:0; width:100%;">
+                <div class="toast align-items-center text-bg-warning border-0" id="alreadyRegisteredToast" role="alert" aria-live="assertive" aria-atomic="true" style="box-shadow:0 2px 16px rgba(251,191,36,0.18); min-height: 60px; font-size: 1.25em; font-weight: 600; white-space:normal; border-radius:0; width:100%; display:none; padding: 1.1rem 1.5rem;">
                     <div class="d-flex">
                         <div class="toast-body">
-                            <i class="bi bi-exclamation-triangle me-2"></i><b>Внимание!</b> Уже записаны на эту олимпиаду.
+                            <i class="bi bi-exclamation-triangle-fill me-2" style="font-size:1.5em;"></i><b>Внимание!</b> Вы уже записаны на эту олимпиаду.
                         </div>
                         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                     </div>
                 </div>
-                <div class="toast align-items-center text-bg-danger border-0" id="notAllowedToast" role="alert" aria-live="assertive" aria-atomic="true" th:if="${error == 'not_allowed'}" style="box-shadow:0 2px 16px rgba(220,53,69,0.18); min-height: 44px; font-size: 1.1em; font-weight: 600; white-space:nowrap; border-radius:0; width:100%;">
+                <div class="toast align-items-center text-bg-info border-0" id="alreadyRegisteredUpcomingToast" role="alert" aria-live="assertive" aria-atomic="true" style="box-shadow:0 2px 16px rgba(13,202,240,0.18); min-height: 60px; font-size: 1.25em; font-weight: 600; white-space:normal; border-radius:0; width:100%; display:none; padding: 1.1rem 1.5rem;">
                     <div class="d-flex">
                         <div class="toast-body">
-                            <i class="bi bi-x-octagon me-2"></i><span style="font-weight:700; color:#fff;">Выберите подходящую олимпиаду!</span> <b>Ошибка!</b> Ваш уровень или курс не подходит.
+                            <i class="bi bi-info-circle-fill me-2" style="font-size:1.5em;"></i><b>Информация!</b> Вы уже записаны на участие в этой олимпиаде.
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="toast align-items-center text-bg-warning border-0" id="alreadyParticipatedToast" role="alert" aria-live="assertive" aria-atomic="true" style="box-shadow:0 2px 16px rgba(251,191,36,0.18); min-height: 60px; font-size: 1.25em; font-weight: 600; white-space:normal; border-radius:0; width:100%; display:none; padding: 1.1rem 1.5rem;">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="bi bi-ban me-2" style="font-size:1.5em;"></i><b>Внимание!</b> Вы уже участвовали в этой олимпиаде. Повторное участие невозможно.
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="toast align-items-center text-bg-danger border-0" id="notAllowedToast" role="alert" aria-live="assertive" aria-atomic="true" style="box-shadow:0 2px 16px rgba(220,53,69,0.18); min-height: 60px; font-size: 1.25em; font-weight: 600; white-space:normal; border-radius:0; width:100%; display:none; padding: 1.1rem 1.5rem;">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="bi bi-x-octagon-fill me-2" style="font-size:1.5em;"></i><span style="font-weight:700; color:#fff;">Ошибка!</span> Вы не можете участвовать: ваш уровень образования или курс не соответствует требованиям.
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="toast align-items-center text-bg-danger border-0" id="errorToast" role="alert" aria-live="assertive" aria-atomic="true" style="box-shadow:0 2px 16px rgba(220,53,69,0.18); min-height: 60px; font-size: 1.25em; font-weight: 600; white-space:nowrap; border-radius:0; width:100%; display:none; padding: 1.1rem 1.5rem;">
+                    <div class="d-flex">
+                        <div class="toast-body" id="errorToastBody">
+                            <i class="bi bi-x-octagon-fill me-2" style="font-size:1.5em;"></i><b>Ошибка!</b> Олимпиада ещё не началась.
                         </div>
                         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                     </div>
@@ -192,6 +216,10 @@
             </div>
 
             <h2 class="mb-4" style="margin-top: 18px; margin-bottom: 18px;">Доступные олимпиады</h2>
+
+            <div th:if="${error == 'time_expired'}" class="alert alert-warning">
+                Время на выполнение олимпиады истекло.
+            </div>
 
             <div class="olympiad-section active">
                 <h4 class="mb-3">Активные олимпиады</h4>
@@ -226,7 +254,7 @@
                                 <div class="olympiad-meta" th:text="'Курс: ' + ${olympiad.courseNumber} + ', ' + (${olympiad.educationLevel != null ? olympiad.educationLevel.displayName : ''})"></div>
                                 <div class="text-muted mb-2" th:text="'Сроки: ' + ${#temporals.format(olympiad.startDate, 'dd.MM.yyyy')} + ' — ' + ${#temporals.format(olympiad.endDate, 'dd.MM.yyyy')}"></div>
                                 <p class="card-text olympiad-desc" th:text="${olympiad.description}">Описание олимпиады</p>
-                                <a th:if="${#authorization.expression('isAuthenticated()')}" th:href="@{/user/olympiad/{id}/start(id=${olympiad.id})}" class="btn btn-participate w-100">Участвовать</a>
+                                <a th:if="${#authorization.expression('isAuthenticated()')}" th:href="@{/api/participations/olympiad/{id}/confirm(id=${olympiad.id})}" class="btn btn-participate w-100">Участвовать</a>
                                 <a th:if="${!#authorization.expression('isAuthenticated()')}" th:href="@{/login(redirect='/api/participations/olympiad/' + ${olympiad.id} + '/confirm')}" class="btn btn-participate w-100">Войти для участия</a>
                             </div>
                         </div>
@@ -365,11 +393,33 @@
                 var toast2 = new bootstrap.Toast(toastEl2, { delay: 4000 });
                 toast2.show();
             }
+            if (getUrlParam('info') === 'already_registered_upcoming') {
+                var toastEl4 = document.getElementById('alreadyRegisteredUpcomingToast');
+                toastEl4.style.display = '';
+                var toast4 = new bootstrap.Toast(toastEl4, { delay: 4000 });
+                toast4.show();
+            }
+            if (getUrlParam('error') === 'already_participated') {
+                var toastEl5 = document.getElementById('alreadyParticipatedToast');
+                toastEl5.style.display = '';
+                var toast5 = new bootstrap.Toast(toastEl5, { delay: 4000 });
+                toast5.show();
+            }
             if (getUrlParam('error') === 'not_allowed') {
                 var toastEl3 = document.getElementById('notAllowedToast');
                 toastEl3.style.display = '';
                 var toast3 = new bootstrap.Toast(toastEl3, { delay: 4000 });
                 toast3.show();
+            }
+            if (getUrlParam('error') === 'olympiad_not_active') {
+                var toastEl = document.getElementById('errorToast');
+                var toastBody = document.getElementById('errorToastBody');
+                if (toastBody) {
+                    toastBody.innerHTML = '<i class="bi bi-x-octagon-fill me-2" style="font-size:1.5em;"></i><b>Ошибка!</b> Олимпиада ещё не началась.';
+                }
+                toastEl.style.display = '';
+                var toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+                toast.show();
             }
             // Кнопка "Вверх"
             const scrollTopBtn = document.getElementById('scrollTopBtn');
@@ -506,10 +556,6 @@
                 var toast2 = new bootstrap.Toast(document.getElementById('alreadyRegisteredToast'), { delay: 4000 });
                 toast2.show();
             }
-            if (document.getElementById('notAllowedToast')) {
-                var toast3 = new bootstrap.Toast(document.getElementById('notAllowedToast'), { delay: 4000 });
-                toast3.show();
-            }
         });
 
         // Фильтрация для каждого блока
@@ -604,6 +650,131 @@
             var modal = new bootstrap.Modal(document.getElementById('helpModal'));
             modal.show();
         };
+    </script>
+    <!-- Модальное окно обратной связи -->
+    <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="feedbackModalLabel">Связь с администратором</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+          </div>
+          <form id="feedbackForm">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="fbName" class="form-label">Имя</label>
+              <input type="text" class="form-control" id="fbName" required placeholder="Ваше имя">
+            </div>
+            <div class="mb-3">
+              <label for="fbEmail" class="form-label">E-mail</label>
+              <input type="email" class="form-control" id="fbEmail" required placeholder="Ваш email для ответа">
+            </div>
+            <div class="mb-3">
+              <label for="fbRole" class="form-label">Кто обращается</label>
+              <select class="form-select" id="fbRole" required>
+                <option value="Студент">Студент</option>
+                <option value="Преподаватель">Преподаватель</option>
+                <option value="Гость">Гость</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="fbTopic" class="form-label">Тема обращения</label>
+              <select class="form-select" id="fbTopic" required>
+                <option value="Вопрос по олимпиаде">Вопрос по олимпиаде</option>
+                <option value="Техническая проблема">Техническая проблема</option>
+                <option value="Другое">Другое</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="fbMsg" class="form-label">Текст сообщения</label>
+              <textarea class="form-control" id="fbMsg" rows="3" required placeholder="Опишите ваш вопрос или проблему"></textarea>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="checkbox" id="fbAgree" required>
+              <label class="form-check-label" for="fbAgree">
+                Я согласен с <a href="#" target="_blank">политикой обработки персональных данных</a>
+              </label>
+            </div>
+            <div id="fbSuccess" class="alert alert-success d-none mt-2">Спасибо! Ваше сообщение отправлено.</div>
+            <div id="fbError" class="alert alert-danger d-none mt-2">Ошибка отправки. Попробуйте позже.</div>
+            <div class="text-muted mt-3" style="font-size:0.95rem;">Обычно мы отвечаем в течение дня.<br>Ответ придет на почту.</div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Отправить</button>
+          </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script>
+    // --- Форма обратной связи ---
+    document.addEventListener('DOMContentLoaded', function() {
+        const feedbackBtnHelp = document.getElementById('feedbackBtnHelpModal');
+        const feedbackModal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+        const feedbackForm = document.getElementById('feedbackForm');
+        const fbSuccess = document.getElementById('fbSuccess');
+        const fbError = document.getElementById('fbError');
+        const fbName = document.getElementById('fbName');
+        const fbEmail = document.getElementById('fbEmail');
+        const fbRole = document.getElementById('fbRole');
+        if (feedbackBtnHelp) {
+          feedbackBtnHelp.onclick = function() {
+            var helpModalEl = document.getElementById('helpModal');
+            var helpModal = bootstrap.Modal.getInstance(helpModalEl) || new bootstrap.Modal(helpModalEl);
+            // После закрытия helpModal откроем feedbackModal
+            function openFeedbackOnce() {
+              feedbackModal.show();
+              helpModalEl.removeEventListener('hidden.bs.modal', openFeedbackOnce);
+              // автозаполнение и сброс формы
+              if (window.currentUser && window.currentUser.isAuthenticated) {
+                fbName.value = window.currentUser.name;
+                fbEmail.value = window.currentUser.email;
+                fbName.readOnly = true;
+                fbEmail.readOnly = true;
+                fbRole.value = 'Студент';
+                fbRole.closest('.mb-3').style.display = 'none';
+              } else {
+                fbName.value = '';
+                fbEmail.value = '';
+                fbName.readOnly = false;
+                fbEmail.readOnly = false;
+                fbRole.closest('.mb-3').style.display = '';
+              }
+              fbSuccess.classList.add('d-none');
+              fbError.classList.add('d-none');
+              feedbackForm.reset();
+            }
+            helpModalEl.addEventListener('hidden.bs.modal', openFeedbackOnce);
+            helpModal.hide();
+          };
+        }
+        feedbackForm.onsubmit = function(e) {
+            e.preventDefault();
+            fbSuccess.classList.add('d-none');
+            fbError.classList.add('d-none');
+            const data = {
+                name: fbName.value,
+                email: fbEmail.value,
+                role: fbRole.value,
+                topic: document.getElementById('fbTopic').value,
+                message: document.getElementById('fbMsg').value
+            };
+            fetch('/api/feedback', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            }).then(r => {
+                if (r.ok) {
+                    fbSuccess.classList.remove('d-none');
+                    feedbackForm.reset();
+                } else {
+                    fbError.classList.remove('d-none');
+                }
+            }).catch(() => {
+                fbError.classList.remove('d-none');
+            });
+        };
+    });
     </script>
 </body>
 </html> 

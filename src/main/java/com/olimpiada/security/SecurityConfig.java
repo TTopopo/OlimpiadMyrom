@@ -26,6 +26,7 @@ public class SecurityConfig {
                 .requestMatchers("/user/profile").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/user/olympiad/**").hasRole("USER")
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/feedback").permitAll()
+                .requestMatchers("/forgot-password", "/reset-password").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

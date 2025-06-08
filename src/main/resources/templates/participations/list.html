@@ -119,7 +119,8 @@
                         <div class="olympiad-meta" th:text="'Курс: ' + ${p.olympiad.courseNumber} + ', ' + (${p.olympiad.educationLevel != null ? p.olympiad.educationLevel.displayName : ''})"></div>
                         <div class="text-muted mb-2" th:text="'Сроки: ' + ${#temporals.format(p.olympiad.startDate, 'dd.MM.yyyy')} + ' — ' + ${#temporals.format(p.olympiad.endDate, 'dd.MM.yyyy')}"></div>
                         <div class="mb-2" th:text="'Дата регистрации: ' + ${#temporals.format(p.registrationDate, 'dd.MM.yyyy HH:mm')}"></div>
-                        <a th:if="${p.olympiad.status.name() == 'ACTIVE'}" th:href="@{/user/olympiad/{id}/active(id=${p.olympiad.id})}" class="btn btn-success w-100">Перейти</a>
+                        <a th:if="${p.olympiad.status.name() == 'ACTIVE' and !p.hasAnswers}" th:href="@{/user/olympiad/{id}/active(id=${p.olympiad.id})}" class="btn btn-success w-100">Перейти</a>
+                        <span th:if="${p.olympiad.status.name() == 'ACTIVE' and p.hasAnswers}" class="btn btn-outline-secondary w-100 disabled">Уже участвовали</span>
                         <span th:if="${p.olympiad.status.name() != 'ACTIVE'}" class="btn btn-outline-secondary w-100 disabled" th:text="${p.olympiad.status.name() == 'PUBLISHED' ? 'Ожидание/Не началась' : 'Завершена'}"></span>
                     </div>
                 </div>

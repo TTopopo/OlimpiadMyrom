@@ -38,6 +38,10 @@ public class UserAnswer {
     @JsonBackReference
     private Task task;
 
+    @ManyToOne
+    @JoinColumn(name = "result_id")
+    private Result result;
+
     public void setUser(User user) {
         this.user = user;
     }

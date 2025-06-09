@@ -1,9 +1,9 @@
 package com.olimpiada.controller;
 
-import com.olimpiada.entity.Answer;
+import com.olimpiada.entity.UserAnswer;
 import com.olimpiada.entity.Task;
 import com.olimpiada.entity.User;
-import com.olimpiada.repository.AnswerRepository;
+import com.olimpiada.service.UserAnswerService;
 import com.olimpiada.repository.TaskRepository;
 import com.olimpiada.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,16 +20,16 @@ import java.util.List;
 @Controller
 @RequestMapping("/api/answers")
 public class AnswerController {
-    private final AnswerRepository answerRepository;
+    private final UserAnswerService userAnswerService;
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
 
     @Autowired
     public AnswerController(
-            AnswerRepository answerRepository,
+            UserAnswerService userAnswerService,
             TaskRepository taskRepository,
             UserRepository userRepository) {
-        this.answerRepository = answerRepository;
+        this.userAnswerService = userAnswerService;
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
     }
@@ -46,20 +46,21 @@ public class AnswerController {
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new RuntimeException("Задание не найдено"));
 
-        Answer answer = new Answer();
-        answer.setUser(user);
-        answer.setTask(task);
-        answer.setAnswerText(answerText);
-        answer.setScore(null); // Оценка будет выставлена позже администратором
+        UserAnswer userAnswer = new UserAnswer();
+        userAnswer.setUser(user);
+        userAnswer.setTask(task);
+        userAnswer.setAnswer(answerText);
+        userAnswer.setScore(null); // Оценка будет выставлена позже администратором
+        userAnswer.setSubmissionTime(LocalDateTime.now());
 
-        answerRepository.save(answer);
+        userAnswerService.save(userAnswer);
 
         return "redirect:/api/tasks/" + taskId + "?success=answer_submitted";
     }
 
     @GetMapping("/task/{taskId}")
     public String getTaskAnswers(@PathVariable Long taskId, Model model) {
-        List<Answer> answers = answerRepository.findByTaskId(taskId);
+        List<UserAnswer> answers = userAnswerService.findByTaskId(taskId);
         model.addAttribute("answers", answers);
         model.addAttribute("taskId", taskId);
         return "answers/list";
@@ -72,7 +73,7 @@ public class AnswerController {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-        List<Answer> answers = answerRepository.findByUserId(user.getId());
+        List<UserAnswer> answers = userAnswerService.findByUserId(user.getId());
         model.addAttribute("answers", answers);
         return "answers/user-list";
     }
@@ -81,12 +82,10 @@ public class AnswerController {
     @PreAuthorize("hasRole('ADMIN')")
     public String evaluateAnswer(
             @PathVariable Long id,
-            @RequestParam Float score) {
-        Answer answer = answerRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Ответ не найден"));
-        
+            @RequestParam Integer score) {
+        UserAnswer answer = userAnswerService.findById(id);
         answer.setScore(score);
-        answerRepository.save(answer);
+        userAnswerService.save(answer);
 
         return "redirect:/api/answers/task/" + answer.getTask().getId();
     }

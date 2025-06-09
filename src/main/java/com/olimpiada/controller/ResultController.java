@@ -2,6 +2,7 @@ package com.olimpiada.controller;
 
 import com.olimpiada.entity.*;
 import com.olimpiada.repository.*;
+import com.olimpiada.service.UserAnswerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/results")
 public class ResultController {
     private final ResultRepository resultRepository;
-    private final AnswerRepository answerRepository;
+    private final UserAnswerService userAnswerService;
     private final OlympiadRepository olympiadRepository;
     private final UserRepository userRepository;
     private final RatingRepository ratingRepository;
@@ -27,12 +28,12 @@ public class ResultController {
     @Autowired
     public ResultController(
             ResultRepository resultRepository,
-            AnswerRepository answerRepository,
+            UserAnswerService userAnswerService,
             OlympiadRepository olympiadRepository,
             UserRepository userRepository,
             RatingRepository ratingRepository) {
         this.resultRepository = resultRepository;
-        this.answerRepository = answerRepository;
+        this.userAnswerService = userAnswerService;
         this.olympiadRepository = olympiadRepository;
         this.userRepository = userRepository;
         this.ratingRepository = ratingRepository;
@@ -71,12 +72,12 @@ public class ResultController {
             User user = participation.getUser();
             
             // Получаем все ответы пользователя по олимпиаде
-            List<Answer> answers = answerRepository.findByUserIdAndTaskOlympiadId(user.getId(), olympiadId);
+            List<UserAnswer> answers = userAnswerService.findByUserAndOlympiad(user.getId(), olympiadId);
             
             // Вычисляем общий балл
             Float totalScore = answers.stream()
                 .filter(answer -> answer.getScore() != null)
-                .map(Answer::getScore)
+                .map(answer -> answer.getScore().floatValue())
                 .reduce(0f, Float::sum);
 
             // Создаем или обновляем результат

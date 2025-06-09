@@ -5,8 +5,6 @@ import com.olimpiada.entity.TaskType;
 import com.olimpiada.entity.Olympiad;
 import com.olimpiada.service.TaskService;
 import com.olimpiada.service.OlympiadService;
-import com.olimpiada.repository.AnswerRepository;
-import com.olimpiada.entity.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,9 +28,6 @@ public class AdminTaskController {
 
     @Autowired
     private OlympiadService olympiadService;
-
-    @Autowired
-    private AnswerRepository answerRepository;
 
     @GetMapping("/add")
     public String showAddForm(@RequestParam Long olympiadId, Model model) {

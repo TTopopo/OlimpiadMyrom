@@ -47,4 +47,8 @@ public class UserAnswerService {
         List<UserAnswer> answers = findByUserAndOlympiad(userId, olympiadId);
         userAnswerRepository.deleteAll(answers);
     }
+    
+    public List<UserAnswer> findByTaskId(Long taskId) {
+        return userAnswerRepository.findByTaskId(taskId);
+    }
 } 

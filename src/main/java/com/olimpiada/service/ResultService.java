@@ -5,9 +5,7 @@ import com.olimpiada.repository.ResultRepository;
 import com.olimpiada.entity.Participation;
 import com.olimpiada.entity.User;
 import com.olimpiada.entity.Olympiad;
-import com.olimpiada.entity.Answer;
 import com.olimpiada.entity.ResultStatus;
-import com.olimpiada.repository.AnswerRepository;
 import com.olimpiada.repository.OlympiadRepository;
 import com.olimpiada.repository.UserRepository;
 import java.time.LocalDateTime;
@@ -30,9 +28,6 @@ public class ResultService {
     
     @Autowired
     private ResultRepository resultRepository;
-    
-    @Autowired
-    private AnswerRepository answerRepository;
     
     @Autowired
     private OlympiadRepository olympiadRepository;

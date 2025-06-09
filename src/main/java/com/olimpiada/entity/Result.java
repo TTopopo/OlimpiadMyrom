@@ -41,7 +41,7 @@ public class Result {
     private Integer place;
 
     @OneToMany(mappedBy = "result", cascade = CascadeType.ALL)
-    private Set<Answer> answers;
+    private Set<UserAnswer> answers;
 
     @ManyToOne
     @JoinColumn(name = "rating_id")
